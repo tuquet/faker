@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Sparkles, FileSpreadsheet, FileCode, Users, Globe, Cpu, UserCheck } from 'lucide-vue-next';
-import Button from './ui/Button.vue';
-import Input from './ui/Input.vue';
+import { Button, Input } from '@tuquet/vue-ui';
 
 interface Props {
   count: number;

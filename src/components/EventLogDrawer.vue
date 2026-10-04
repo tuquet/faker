@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue';
 import { X, Trash2, Copy, Check, Terminal } from 'lucide-vue-next';
-import Button from './ui/Button.vue';
+import { Button } from '@tuquet/vue-ui';
 import type { LogEntry } from '../types/user';
 import { copyToClipboard } from '../lib/utils';
 

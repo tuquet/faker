@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { Search, ArrowUpDown, Copy, Check, Mail, Phone, Key, ChevronLeft, ChevronRight } from 'lucide-vue-next';
-import Badge from './ui/Badge.vue';
-import Button from './ui/Button.vue';
-import Input from './ui/Input.vue';
+import { Badge, Button, Input } from '@tuquet/vue-ui';
+import { exportToCsv } from '@tuquet/vue-table';
 import type { UserProfile } from '../types/user';
 import { copyToClipboard } from '../lib/utils';
 
@@ -188,7 +187,13 @@ const paginatedUsers = computed(() => {
               {{ getFullName(u) }}
             </td>
             <td class="py-2.5 px-4 whitespace-nowrap">
-              <Badge :variant="u.gender === 'female' ? 'warning' : 'info'" class="text-[10px]">
+              <Badge
+                variant="outline"
+                :class="[
+                  'text-[10px]',
+                  u.gender === 'female' ? 'bg-pink-50 text-pink-700 border-pink-200' : 'bg-blue-50 text-blue-700 border-blue-200'
+                ]"
+              >
                 {{ u.gender === 'female' ? 'Nữ ♀' : 'Nam ♂' }}
               </Badge>
             </td>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { LayoutGrid, TableProperties, Terminal, CheckCircle2, Loader2 } from 'lucide-vue-next';
-import Button from './ui/Button.vue';
-import Badge from './ui/Badge.vue';
+import { Button, Badge } from '@tuquet/vue-ui';
 
 interface Props {
   viewMode: 'cards' | 'table';
@@ -36,7 +35,7 @@ const emit = defineEmits<{
             <h1 class="text-base font-bold text-slate-900 leading-tight">
               Random User Generator
             </h1>
-            <Badge variant="info" class="text-[10px] font-bold uppercase tracking-wider">
+            <Badge variant="secondary" class="text-[10px] font-bold uppercase tracking-wider bg-sky-50 text-sky-700 border-sky-200">
               Tuquet Suite
             </Badge>
           </div>
@@ -49,15 +48,15 @@ const emit = defineEmits<{
       <!-- Center & Right Controls -->
       <div class="flex items-center space-x-3">
         <!-- Status indicator -->
-        <Badge v-if="isGenerating" variant="warning" class="gap-1.5 py-1">
+        <Badge v-if="isGenerating" variant="outline" class="gap-1.5 py-1 bg-amber-50 text-amber-700 border-amber-200">
           <Loader2 class="w-3.5 h-3.5 animate-spin" />
           <span>Đang sinh dữ liệu...</span>
         </Badge>
-        <Badge v-else-if="isFallback" variant="warning" class="gap-1.5 py-1">
+        <Badge v-else-if="isFallback" variant="outline" class="gap-1.5 py-1 bg-amber-50 text-amber-700 border-amber-200">
           <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
           <span>Offline Rust Core</span>
         </Badge>
-        <Badge v-else variant="success" class="gap-1.5 py-1">
+        <Badge v-else variant="outline" class="gap-1.5 py-1 bg-emerald-50 text-emerald-700 border-emerald-200">
           <CheckCircle2 class="w-3.5 h-3.5" />
           <span>{{ sourceText || 'Ready' }}</span>
         </Badge>

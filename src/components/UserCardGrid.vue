@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { Mail, Phone, MapPin, Copy, Check, Key, Code2, User } from 'lucide-vue-next';
-import Card from './ui/Card.vue';
-import Badge from './ui/Badge.vue';
+import { Card, Badge } from '@tuquet/vue-ui';
 import type { UserProfile } from '../types/user';
 import { copyToClipboard } from '../lib/utils';
 

@@ -31,6 +31,8 @@
     "@tanstack/vue-table": "^8.21.2",
     "@tauri-apps/api": "^2.2.0",
     "@tauri-apps/plugin-opener": "^2.2.0",
+    "@tuquet/vue-table": "^0.2.1",
+    "@tuquet/vue-ui": "^0.2.1",
     "@vueuse/core": "^12.8.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
