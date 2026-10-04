@@ -3,6 +3,8 @@ export interface UserLocation {
     number?: number | string;
     name?: string;
   };
+  ward?: string;
+  district?: string;
   city?: string;
   state?: string;
   country?: string;

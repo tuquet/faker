@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Mail, Phone, MapPin, Copy, Check, Key, Code2, Download } from 'lucide-vue-next';
+import { Mail, Phone, MapPin, Copy, Check, Key, Code2, Download, CreditCard } from 'lucide-vue-next';
 import { Card, Badge } from '@tuquet/vue-ui';
 import type { UserProfile } from '../types/user';
 import { copyToClipboard } from '../lib/utils';
@@ -40,9 +40,11 @@ function getFullAddress(u: UserProfile): string {
   const street = u.location?.street?.name
     ? `${u.location.street.number || ''} ${u.location.street.name}`
     : '';
+  const ward = u.location?.ward || '';
+  const district = u.location?.district || '';
   const city = u.location?.city || '';
   const country = u.location?.country || '';
-  return [street, city, country].filter(Boolean).join(', ');
+  return [street, ward, district, city, country].filter(Boolean).join(', ');
 }
 </script>
 
@@ -142,6 +144,22 @@ function getFullAddress(u: UserProfile): string {
               <span class="truncate font-medium text-slate-700 group-hover:text-sky-900">{{ getFullAddress(u) }}</span>
             </div>
             <Check v-if="copiedKey === `addr-${idx}`" class="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <Copy v-else class="w-3.5 h-3.5 text-slate-300 group-hover:text-sky-600 opacity-0 group-hover:opacity-100 shrink-0 transition" />
+          </div>
+
+          <!-- CCCD / National ID -->
+          <div
+            v-if="u.id?.value"
+            @click="handleCopy(u.id.value, `id-${idx}`, u.id.name || 'ID')"
+            class="p-2 rounded-xl bg-slate-50 hover:bg-sky-50/80 border border-slate-100 hover:border-sky-200 transition-all flex items-center justify-between cursor-pointer group font-mono text-[11px]"
+            :title="`Click to copy ${u.id.name || 'ID'}`"
+          >
+            <div class="flex items-center gap-2 truncate">
+              <CreditCard class="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-600 shrink-0" />
+              <span class="text-slate-500 font-semibold">{{ u.id.name || 'ID' }}:</span>
+              <span class="truncate font-bold text-slate-800 group-hover:text-sky-900">{{ u.id.value }}</span>
+            </div>
+            <Check v-if="copiedKey === `id-${idx}`" class="w-3.5 h-3.5 text-emerald-600 shrink-0" />
             <Copy v-else class="w-3.5 h-3.5 text-slate-300 group-hover:text-sky-600 opacity-0 group-hover:opacity-100 shrink-0 transition" />
           </div>
         </div>

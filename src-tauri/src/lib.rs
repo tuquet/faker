@@ -169,7 +169,7 @@ async fn export_bundle_dialog(users: Vec<Value>) -> Result<Option<String>, Strin
             .unwrap_or_default();
 
         let mut csv_rows = vec![
-            "STT,Ho Ten,Chuc Danh,Gioi Tinh,Quoc Tich,Email,So Dien Thoai,Avatar File,Avatar URL,Dia Chi,Thanh Pho,Quoc Gia,CCCD/SSN,Username,Password".to_string()
+            "STT,Full Name,First Name,Last Name,Gender,Date of Birth,Age,CCCD / ID,Email,Username,Password,Phone,Street Address,Ward,District,City,Postcode,Country,Job,Avatar File,Avatar URL".to_string()
         ];
 
         for (i, u) in users.iter().enumerate() {
@@ -203,39 +203,54 @@ async fn export_bundle_dialog(users: Vec<Value>) -> Result<Option<String>, Strin
                 }
             }
 
-            let full_name = format!("{} {}", u["name"]["first"].as_str().unwrap_or(""), u["name"]["last"].as_str().unwrap_or(""));
-            let job = u["job"].as_str().unwrap_or("");
+            let first_name = u["name"]["first"].as_str().unwrap_or("");
+            let last_name = u["name"]["last"].as_str().unwrap_or("");
+            let full_name = format!("{} {}", first_name, last_name);
             let gender = u["gender"].as_str().unwrap_or("");
-            let nat = u["nat"].as_str().unwrap_or("");
+            let dob_raw = u["dob"]["date"].as_str().unwrap_or("");
+            let dob = if dob_raw.len() >= 10 { &dob_raw[..10] } else { dob_raw };
+            let age = u["dob"]["age"].to_string();
+            let id_val = u["id"]["value"].as_str().unwrap_or("");
             let email = u["email"].as_str().unwrap_or("");
+            let password = u["login"]["password"].as_str().unwrap_or("");
             let phone = u["phone"].as_str().unwrap_or("");
+            let street_num = u["location"]["street"]["number"].to_string();
+            let street_name = u["location"]["street"]["name"].as_str().unwrap_or("");
+            let street_addr = format!("{} {}", street_num, street_name).trim().to_string();
+            let ward = u["location"]["ward"].as_str().unwrap_or("");
+            let district = u["location"]["district"].as_str().unwrap_or("");
+            let city = u["location"]["city"].as_str().unwrap_or("");
+            let postcode = u["location"]["postcode"].as_str().unwrap_or("");
+            let country = u["location"]["country"].as_str().unwrap_or("");
+            let job = u["job"].as_str().unwrap_or("");
             let avatar_file = format!("./avatars/{}", filename);
             let avatar_url = img_url;
-            let street = format!("{} {}", u["location"]["street"]["number"], u["location"]["street"]["name"].as_str().unwrap_or(""));
-            let city = u["location"]["city"].as_str().unwrap_or("");
-            let country = u["location"]["country"].as_str().unwrap_or("");
-            let id_val = u["id"]["value"].as_str().unwrap_or("");
-            let password = u["login"]["password"].as_str().unwrap_or("");
 
             let escape = |s: &str| format!("\"{}\"", s.replace('"', "\"\""));
 
             csv_rows.push(format!(
-                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",
+                "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",
                 i + 1,
                 escape(&full_name),
-                escape(job),
+                escape(first_name),
+                escape(last_name),
                 escape(gender),
-                escape(nat),
-                escape(email),
-                escape(phone),
-                escape(&avatar_file),
-                escape(avatar_url),
-                escape(&street),
-                escape(city),
-                escape(country),
+                escape(dob),
+                escape(&age),
                 escape(id_val),
+                escape(email),
                 escape(username),
-                escape(password)
+                escape(password),
+                escape(phone),
+                escape(&street_addr),
+                escape(ward),
+                escape(district),
+                escape(city),
+                escape(postcode),
+                escape(country),
+                escape(job),
+                escape(&avatar_file),
+                escape(avatar_url)
             ));
         }
 

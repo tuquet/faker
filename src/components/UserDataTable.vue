@@ -42,6 +42,17 @@ function getFullName(u: UserProfile): string {
   return `${title}${u.name?.first || ''} ${u.name?.last || ''}`.trim() || 'N/A';
 }
 
+function getFullAddress(u: UserProfile): string {
+  const street = u.location?.street?.name
+    ? `${u.location.street.number || ''} ${u.location.street.name}`
+    : '';
+  const ward = u.location?.ward || '';
+  const district = u.location?.district || '';
+  const city = u.location?.city || '';
+  const country = u.location?.country || '';
+  return [street, ward, district, city, country].filter(Boolean).join(', ');
+}
+
 function toggleSort(key: 'name' | 'gender' | 'nat' | 'email') {
   if (sortKey.value === key) {
     sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
@@ -233,8 +244,9 @@ const paginatedUsers = computed(() => {
                 <Copy v-else class="w-3 h-3 text-slate-300 opacity-0 group-hover:opacity-100 shrink-0" />
               </button>
             </td>
-            <td class="py-2.5 px-4 max-w-[180px] truncate text-slate-600" :title="`${u.location?.city || ''}, ${u.location?.country || ''}`">
-              {{ u.location?.city || '' }}, {{ u.location?.country || '' }}
+            <td class="py-2.5 px-4 max-w-[220px] truncate text-slate-600" :title="getFullAddress(u)">
+              <div class="truncate font-medium text-slate-800">{{ u.location?.city || '' }}</div>
+              <div class="truncate text-[11px] text-slate-400">{{ getFullAddress(u) }}</div>
             </td>
             <td class="py-2.5 px-4 whitespace-nowrap">
               <div class="flex items-center gap-2 font-mono text-[11px]">
@@ -249,6 +261,17 @@ const paginatedUsers = computed(() => {
                   <Check v-if="copiedKey === `tbl-pass-${idx}`" class="w-3 h-3 text-emerald-600" />
                   <Key v-else class="w-3 h-3 text-slate-400" />
                 </button>
+              </div>
+              <div v-if="u.id?.value" class="text-[10px] font-mono text-slate-400 flex items-center gap-1 mt-0.5">
+                <span>{{ u.id.name || 'ID' }}:</span>
+                <button
+                  @click="handleCopy(u.id.value, `tbl-id-${idx}`, u.id.name || 'ID')"
+                  class="font-semibold text-slate-600 hover:text-sky-600 cursor-pointer"
+                  title="Click to copy ID"
+                >
+                  {{ u.id.value }}
+                </button>
+                <Check v-if="copiedKey === `tbl-id-${idx}`" class="w-2.5 h-2.5 text-emerald-600" />
               </div>
             </td>
           </tr>

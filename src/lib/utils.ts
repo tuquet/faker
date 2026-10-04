@@ -33,47 +33,66 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 export function generateCSV(users: UserProfile[]): string {
   const headers = [
     'STT',
-    'Ho Ten',
-    'Chuc Danh',
-    'Gioi Tinh',
-    'Quoc Tich',
+    'Full Name',
+    'First Name',
+    'Last Name',
+    'Gender',
+    'Date of Birth',
+    'Age',
+    'CCCD / ID',
     'Email',
-    'So Dien Thoai',
-    'Avatar URL',
-    'Dia Chi',
-    'Thanh Pho',
-    'Quoc Gia',
-    'CCCD/SSN',
     'Username',
     'Password',
+    'Phone',
+    'Street Address',
+    'Ward',
+    'District',
+    'City',
+    'Postcode',
+    'Country',
+    'Job',
+    'Avatar URL',
   ];
 
   const rows = users.map((u, i) => {
     const fullName = `${u.name?.title ? u.name.title + ' ' : ''}${u.name?.first || ''} ${u.name?.last || ''}`.trim();
+    const firstName = u.name?.first || '';
+    const lastName = u.name?.last || '';
+    const dob = u.dob?.date ? u.dob.date.slice(0, 10) : '';
+    const age = u.dob?.age || '';
+    const idVal = u.id?.value || '';
+    const street = `${u.location?.street?.number ? u.location.street.number + ' ' : ''}${u.location?.street?.name || ''}`.trim();
+    const ward = u.location?.ward || '';
+    const district = u.location?.district || '';
+    const city = u.location?.city || '';
+    const postcode = u.location?.postcode || '';
+    const country = u.location?.country || '';
     const job = u.job || '';
     const avatarUrl = u.picture?.large || u.picture?.medium || '';
-    const street = `${u.location?.street?.number ? u.location.street.number + ' ' : ''}${u.location?.street?.name || ''}`.trim();
-    const city = u.location?.city || '';
-    const country = u.location?.country || '';
-    const idVal = u.id?.value || '';
 
     const escapeCsv = (str: string | number) => `"${String(str || '').replace(/"/g, '""')}"`;
 
     return [
       i + 1,
       escapeCsv(fullName),
-      escapeCsv(job),
+      escapeCsv(firstName),
+      escapeCsv(lastName),
       escapeCsv(u.gender || ''),
-      escapeCsv(u.nat || ''),
-      escapeCsv(u.email || ''),
-      escapeCsv(u.phone || ''),
-      escapeCsv(avatarUrl),
-      escapeCsv(street),
-      escapeCsv(city),
-      escapeCsv(country),
+      escapeCsv(dob),
+      escapeCsv(age),
       escapeCsv(idVal),
+      escapeCsv(u.email || ''),
       escapeCsv(u.login?.username || ''),
       escapeCsv(u.login?.password || ''),
+      escapeCsv(u.phone || ''),
+      escapeCsv(street),
+      escapeCsv(ward),
+      escapeCsv(district),
+      escapeCsv(city),
+      escapeCsv(postcode),
+      escapeCsv(country),
+      escapeCsv(job),
+      escapeCsv(avatarUrl),
     ].join(',');
   });
 

@@ -34,6 +34,338 @@ pub fn to_ascii_slug(s: &str) -> String {
     out.trim_matches('_').to_string()
 }
 
+struct DistrictLocation {
+    name: &'static str,
+    wards: &'static [&'static str],
+    streets: &'static [&'static str],
+}
+
+struct ProvinceLocation {
+    code: &'static str,
+    city: &'static str,
+    zipcode: &'static str,
+    districts: &'static [DistrictLocation],
+}
+
+static PROVINCES_VN: &[ProvinceLocation] = &[
+    ProvinceLocation {
+        code: "001",
+        city: "Hà Nội",
+        zipcode: "100000",
+        districts: &[
+            DistrictLocation {
+                name: "Quận Hoàn Kiếm",
+                wards: &["Phường Tràng Tiền", "Phường Hàng Bạc", "Phường Hàng Bài", "Phường Lý Thái Tổ"],
+                streets: &["Phố Tràng Tiền", "Phố Đinh Tiên Hoàng", "Phố Hàng Khay", "Phố Bà Triệu", "Phố Lý Thường Kiệt"],
+            },
+            DistrictLocation {
+                name: "Quận Ba Đình",
+                wards: &["Phường Điện Biên", "Phường Kim Mã", "Phường Liễu Giai", "Phường Đội Cấn"],
+                streets: &["Đường Kim Mã", "Đường Liễu Giai", "Đường Đội Cấn", "Đường Quán Thánh", "Đường Phan Đình Phùng"],
+            },
+            DistrictLocation {
+                name: "Quận Cầu Giấy",
+                wards: &["Phường Dịch Vọng Hậu", "Phường Nghĩa Tân", "Phường Mai Dịch", "Phường Yên Hòa"],
+                streets: &["Đường Duy Tân", "Đường Xuân Thủy", "Đường Cầu Giấy", "Đường Trần Thái Tông", "Đường Hoàng Quốc Việt"],
+            },
+            DistrictLocation {
+                name: "Quận Đống Đa",
+                wards: &["Phường Láng Hạ", "Phường Ô Chợ Dừa", "Phường Văn Miếu", "Phường Khâm Thiên"],
+                streets: &["Đường Thái Hà", "Đường Huỳnh Thúc Kháng", "Đường Xã Đàn", "Đường Chùa Bộc", "Đường Tôn Đức Thắng"],
+            },
+            DistrictLocation {
+                name: "Quận Hai Bà Trưng",
+                wards: &["Phường Bạch Mai", "Phường Bách Khoa", "Phường Minh Khai", "Phường Lê Đại Hành"],
+                streets: &["Đường Phố Huế", "Đường Đại Cồ Việt", "Đường Bạch Mai", "Đường Minh Khai", "Đường Trần Khát Chân"],
+            },
+        ],
+    },
+    ProvinceLocation {
+        code: "079",
+        city: "TP Hồ Chí Minh",
+        zipcode: "700000",
+        districts: &[
+            DistrictLocation {
+                name: "Quận 1",
+                wards: &["Phường Bến Nghé", "Phường Bến Thành", "Phường Đa Kao", "Phường Tân Định"],
+                streets: &["Đường Nguyễn Huệ", "Đường Lê Lợi", "Đường Đồng Khởi", "Đường Pasteur", "Đường Nam Kỳ Khởi Nghĩa", "Đường Hai Bà Trưng"],
+            },
+            DistrictLocation {
+                name: "Quận 3",
+                wards: &["Phường Võ Thị Sáu", "Phường 1", "Phường 4", "Phường 9"],
+                streets: &["Đường Nguyễn Thị Minh Khai", "Đường Điện Biên Phủ", "Đường Cách Mạng Tháng 8", "Đường Lý Chính Thắng", "Đường Trương Định"],
+            },
+            DistrictLocation {
+                name: "Quận Bình Thạnh",
+                wards: &["Phường 25", "Phường 26", "Phường 19", "Phường 15"],
+                streets: &["Đường Điện Biên Phủ", "Đường Xô Viết Nghệ Tĩnh", "Đường Bạch Đằng", "Đường Đinh Bộ Lĩnh", "Đường Nơ Trang Long"],
+            },
+            DistrictLocation {
+                name: "Quận Tân Bình",
+                wards: &["Phường 2", "Phường 12", "Phường 15", "Phường 4"],
+                streets: &["Đường Cộng Hòa", "Đường Trường Chinh", "Đường Hoàng Văn Thụ", "Đường Phổ Quang", "Đường Lê Văn Sỹ"],
+            },
+            DistrictLocation {
+                name: "TP Thủ Đức",
+                wards: &["Phường Thảo Điền", "Phường An Phú", "Phường Linh Trung", "Phường Hiệp Phú"],
+                streets: &["Đường Võ Văn Ngân", "Đường Đỗ Xuân Hợp", "Đại lộ Mai Chí Thọ", "Đường Song Hành", "Đường Nguyễn Duy Trinh"],
+            },
+        ],
+    },
+    ProvinceLocation {
+        code: "048",
+        city: "Đà Nẵng",
+        zipcode: "550000",
+        districts: &[
+            DistrictLocation {
+                name: "Quận Hải Châu",
+                wards: &["Phường Hải Châu 1", "Phường Thạch Thang", "Phường Hòa Cường Bắc"],
+                streets: &["Đường Bạch Đằng", "Đường Trần Phú", "Đường Lê Duẩn", "Đường Nguyễn Văn Linh", "Đường Hùng Vương"],
+            },
+            DistrictLocation {
+                name: "Quận Sơn Trà",
+                wards: &["Phường An Hải Bắc", "Phường Phước Mỹ", "Phường Nại Hiên Đông"],
+                streets: &["Đường Võ Nguyên Giáp", "Đường Phạm Văn Đồng", "Đường Ngô Quyền", "Đường Hoàng Sa"],
+            },
+            DistrictLocation {
+                name: "Quận Thanh Khê",
+                wards: &["Phường Tam Thuận", "Phường Xuân Hà", "Phường Vĩnh Trung"],
+                streets: &["Đường Điện Biên Phủ", "Đường Hà Huy Tập", "Đường Lê Duẩn", "Đường Hùng Vương"],
+            },
+        ],
+    },
+    ProvinceLocation {
+        code: "031",
+        city: "Hải Phòng",
+        zipcode: "180000",
+        districts: &[
+            DistrictLocation {
+                name: "Quận Hồng Bàng",
+                wards: &["Phường Hoàng Văn Thụ", "Phường Minh Khai", "Phường Phan Bội Châu"],
+                streets: &["Đường Đinh Tiên Hoàng", "Đường Hoàng Văn Thụ", "Đường Quang Trung", "Đường Trần Phú"],
+            },
+            DistrictLocation {
+                name: "Quận Ngô Quyền",
+                wards: &["Phường Lạc Viên", "Phường Cầu Đất", "Phường Lương Khánh Thiện"],
+                streets: &["Đường Lê Lợi", "Đường Cầu Đất", "Đường Đà Nẵng", "Đường Lạch Tray"],
+            },
+            DistrictLocation {
+                name: "Quận Lê Chân",
+                wards: &["Phường An Biên", "Phường Cát Dài", "Phường Hàng Kênh"],
+                streets: &["Đường Tô Hiệu", "Đường Mê Linh", "Đường Trần Nguyên Hãn"],
+            },
+        ],
+    },
+    ProvinceLocation {
+        code: "092",
+        city: "Cần Thơ",
+        zipcode: "900000",
+        districts: &[
+            DistrictLocation {
+                name: "Quận Ninh Kiều",
+                wards: &["Phường Tân An", "Phường An Cư", "Phường An Phú", "Phường Xuân Khánh"],
+                streets: &["Đường 30 Tháng 4", "Đại lộ Hòa Bình", "Đường Nguyễn Trãi", "Đường Mậu Thân"],
+            },
+            DistrictLocation {
+                name: "Quận Cái Răng",
+                wards: &["Phường Lê Bình", "Phường Hưng Phú", "Phường Ba Láng"],
+                streets: &["Đường Quang Trung", "Đường Phạm Hùng", "Đường Võ Nguyên Giáp"],
+            },
+        ],
+    },
+    ProvinceLocation {
+        code: "074",
+        city: "Bình Dương",
+        zipcode: "820000",
+        districts: &[
+            DistrictLocation {
+                name: "TP Thủ Dầu Một",
+                wards: &["Phường Phú Hòa", "Phường Phú Lợi", "Phường Hiệp Thành", "Phường Chánh Nghĩa"],
+                streets: &["Đại lộ Bình Dương", "Đường Yersin", "Đường Cách Mạng Tháng 8", "Đường Phú Lợi"],
+            },
+            DistrictLocation {
+                name: "TP Thuận An",
+                wards: &["Phường Lái Thiêu", "Phường An Phú", "Phường Bình Hòa"],
+                streets: &["Đường DT743", "Đường Nguyễn Trãi", "Đường Cách Mạng Tháng 8"],
+            },
+        ],
+    },
+    ProvinceLocation {
+        code: "075",
+        city: "Đồng Nai",
+        zipcode: "810000",
+        districts: &[
+            DistrictLocation {
+                name: "TP Biên Hòa",
+                wards: &["Phường Tân Phong", "Phường Trảng Dài", "Phường Thống Nhất", "Phường Quyết Thắng"],
+                streets: &["Đường Đồng Khởi", "Đường Phạm Văn Thuận", "Đường Nguyễn Ái Quốc", "Đường Võ Thị Sáu"],
+            },
+        ],
+    },
+    ProvinceLocation {
+        code: "056",
+        city: "Khánh Hòa",
+        zipcode: "650000",
+        districts: &[
+            DistrictLocation {
+                name: "TP Nha Trang",
+                wards: &["Phường Lộc Thọ", "Phường Tân Lập", "Phường Phương Sài", "Phường Vĩnh Hải"],
+                streets: &["Đường Trần Phú", "Đường 2 Tháng 4", "Đường Lê Thánh Tôn", "Đường Thái Nguyên"],
+            },
+        ],
+    },
+    ProvinceLocation {
+        code: "022",
+        city: "Quảng Ninh",
+        zipcode: "200000",
+        districts: &[
+            DistrictLocation {
+                name: "TP Hạ Long",
+                wards: &["Phường Bãi Cháy", "Phường Hồng Gai", "Phường Cao Xanh", "Phường Bạch Đằng"],
+                streets: &["Đường Hạ Long", "Đường Lê Thánh Tông", "Đường Trần Hưng Đạo"],
+            },
+        ],
+    },
+    ProvinceLocation {
+        code: "046",
+        city: "Thừa Thiên Huế",
+        zipcode: "530000",
+        districts: &[
+            DistrictLocation {
+                name: "TP Huế",
+                wards: &["Phường Vĩnh Ninh", "Phường Phú Nhuận", "Phường Phú Hội", "Phường Thuận Hòa"],
+                streets: &["Đường Lê Lợi", "Đường Hùng Vương", "Đường Nguyễn Huệ", "Đường Đống Đa"],
+            },
+        ],
+    },
+];
+
+static WEIGHTED_SURNAMES_VN: &[(&str, u32)] = &[
+    ("Nguyễn", 384),
+    ("Trần", 110),
+    ("Lê", 95),
+    ("Phạm", 71),
+    ("Hoàng", 30),
+    ("Huỳnh", 21),
+    ("Phan", 45),
+    ("Vũ", 20),
+    ("Võ", 19),
+    ("Đặng", 21),
+    ("Bùi", 20),
+    ("Đỗ", 14),
+    ("Hồ", 13),
+    ("Ngô", 13),
+    ("Dương", 10),
+    ("Lý", 7),
+    ("Đinh", 8),
+    ("Đoàn", 7),
+    ("Lâm", 7),
+    ("Mai", 6),
+    ("Trịnh", 6),
+    ("Đào", 5),
+    ("Cao", 5),
+    ("Hà", 5),
+    ("Lương", 5),
+    ("Thái", 4),
+    ("Châu", 4),
+    ("Tạ", 3),
+    ("Phùng", 3),
+];
+
+fn pick_weighted<'a>(rng: &mut impl rand::Rng, items: &'a [(&'a str, u32)]) -> &'a str {
+    let total: u32 = items.iter().map(|(_, w)| *w).sum();
+    let mut choice = rng.gen_range(0..total);
+    for &(item, weight) in items {
+        if choice < weight {
+            return item;
+        }
+        choice -= weight;
+    }
+    items[0].0
+}
+
+fn generate_vietnamese_cccd(
+    rng: &mut impl rand::Rng,
+    province_code: &str,
+    birth_year: u32,
+    is_male: bool,
+) -> String {
+    let century_gender_digit = match (birth_year, is_male) {
+        (1900..=1999, true) => '0',
+        (1900..=1999, false) => '1',
+        (2000..=2099, true) => '2',
+        (2000..=2099, false) => '3',
+        (2100..=2199, true) => '4',
+        (2100..=2199, false) => '5',
+        _ => '0',
+    };
+    let year_suffix = format!("{:02}", birth_year % 100);
+    let random_seq = format!("{:06}", rng.gen_range(100000..=999999));
+    format!("{}{}{}{}", province_code, century_gender_digit, year_suffix, random_seq)
+}
+
+fn generate_mmo_password(rng: &mut impl rand::Rng) -> String {
+    let prefixes = [
+        "Tuquet", "VnPro", "Shield", "Secure", "Titan", "Falcon", "Nova", "Prime", "Turbo", "Apex", "Matrix", "Cyber"
+    ];
+    let specials = ['@', '#', '$', '!', '&', '*'];
+    let suffixes = ["acc", "pro", "mmo", "hub", "net", "top", "run", "key"];
+
+    let prefix = prefixes[rng.gen_range(0..prefixes.len())];
+    let s1 = specials[rng.gen_range(0..specials.len())];
+    let s2 = specials[rng.gen_range(0..specials.len())];
+    let num: u32 = rng.gen_range(1000..9999);
+    let suffix = suffixes[rng.gen_range(0..suffixes.len())];
+
+    format!("{}{}{}{}{}", prefix, s1, num, s2, suffix)
+}
+
+struct UsStateLocation {
+    state: &'static str,
+    city: &'static str,
+    zipcode: &'static str,
+    streets: &'static [&'static str],
+}
+
+static US_LOCATIONS: &[UsStateLocation] = &[
+    UsStateLocation {
+        state: "California",
+        city: "Los Angeles",
+        zipcode: "90001",
+        streets: &["Sunset Boulevard", "Hollywood Boulevard", "Wilshire Boulevard", "Rodeo Drive"],
+    },
+    UsStateLocation {
+        state: "New York",
+        city: "New York City",
+        zipcode: "10001",
+        streets: &["Broadway", "Fifth Avenue", "Wall Street", "Madison Avenue", "Park Avenue"],
+    },
+    UsStateLocation {
+        state: "Texas",
+        city: "Houston",
+        zipcode: "77001",
+        streets: &["Main Street", "Texas Avenue", "Post Oak Boulevard", "Westheimer Road"],
+    },
+    UsStateLocation {
+        state: "Florida",
+        city: "Miami",
+        zipcode: "33101",
+        streets: &["Ocean Drive", "Biscayne Boulevard", "Collins Avenue", "Brickell Avenue"],
+    },
+    UsStateLocation {
+        state: "Washington",
+        city: "Seattle",
+        zipcode: "98101",
+        streets: &["Pike Street", "Pine Street", "Second Avenue", "University Street"],
+    },
+    UsStateLocation {
+        state: "Illinois",
+        city: "Chicago",
+        zipcode: "60601",
+        streets: &["Michigan Avenue", "State Street", "Wacker Drive", "Lake Shore Drive"],
+    },
+];
+
 pub fn generate_local_users(
     count: u32,
     gender_filter: Option<&str>,
@@ -44,12 +376,6 @@ pub fn generate_local_users(
     let nat = nat_filter.unwrap_or("VN").to_uppercase();
     let is_vn = nat.contains("VN") || nat == "ALL";
     let is_svg = avatar_style == Some("svg");
-
-    let last_names_vn = [
-        "Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Huỳnh", "Phan", "Vũ", "Võ", "Đặng",
-        "Bùi", "Đỗ", "Hồ", "Ngô", "Dương", "Lý", "Đinh", "Đoàn", "Lâm", "Mai",
-        "Trịnh", "Đào", "Cao", "Hà", "Lưu", "Lương", "Thái", "Châu", "Tạ", "Phùng"
-    ];
 
     let middle_names_male_vn = [
         "Văn", "Hữu", "Đức", "Quang", "Minh", "Thanh", "Đình", "Ngọc", "Tuấn", "Hoàng",
@@ -81,17 +407,6 @@ pub fn generate_local_users(
         "Kiến trúc sư Giải pháp (Solution Architect)", "Giám đốc Vận hành (COO)"
     ];
 
-    let cities_vn = [
-        "Hà Nội", "TP Hồ Chí Minh", "Đà Nẵng", "Hải Phòng", "Cần Thơ",
-        "Nha Trang", "Huế", "Vũng Tàu", "Bình Dương", "Đồng Nai", "Quảng Ninh"
-    ];
-
-    let streets_vn = [
-        "Đường Lê Lợi", "Đường Nguyễn Huệ", "Đường Trần Hưng Đạo", "Đường Hai Bà Trưng",
-        "Đường Lý Thường Kiệt", "Đường Phan Chu Trinh", "Đường Hoàng Hoa Thám", "Đường Điện Biên Phủ",
-        "Đường Nguyễn Thị Minh Khai", "Đường Võ Văn Kiệt", "Đường Cách Mạng Tháng 8", "Đường Nam Kỳ Khởi Nghĩa"
-    ];
-
     // International fallback arrays
     let first_names_male_en = [
         "James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph",
@@ -108,19 +423,18 @@ pub fn generate_local_users(
         "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas"
     ];
 
-    let cities_en = [
-        "New York", "Los Angeles", "Chicago", "Houston", "Phoenix",
-        "Philadelphia", "San Antonio", "San Diego", "Austin", "Seattle"
-    ];
-
-    let streets_en = [
-        "Main Street", "Oak Avenue", "Maple Lane", "Cedar Drive", "Pine Court",
-        "Washington Boulevard", "Lakeview Terrace", "Sunset Way", "Broadway"
-    ];
-
     let jobs_en = [
         "Staff Software Engineer", "Product Manager", "Lead Data Scientist",
         "Cloud Solutions Architect", "UI/UX Principal", "Engineering Director"
+    ];
+
+    let telco_prefixes_vn = [
+        // Viettel
+        "098", "097", "096", "086", "032", "033", "034", "035", "036", "037", "038", "039",
+        // Vinaphone
+        "091", "094", "088", "083", "084", "085", "081", "082",
+        // Mobifone
+        "090", "093", "089", "070", "079", "077", "076", "078",
     ];
 
     let mut results = Vec::new();
@@ -135,8 +449,15 @@ pub fn generate_local_users(
         let gender_str = if is_male { "male" } else { "female" };
         let title_str = if is_male { "Mr" } else { if rng.gen_bool(0.6) { "Ms" } else { "Mrs" } };
 
-        let (full_first_name, last_name, job, street_name, city_name, country_name) = if is_vn {
-            let last = last_names_vn[rng.gen_range(0..last_names_vn.len())];
+        // Realistic MMO working & registration age bracket: 18 to 45
+        let age = rng.gen_range(18..=45);
+        let birth_year = 2026 - age;
+        let birth_month = rng.gen_range(1..=12);
+        let birth_day = rng.gen_range(1..=28);
+        let dob_str = format!("{:04}-{:02}-{:02}T08:00:00.000Z", birth_year, birth_month, birth_day);
+
+        let (full_first_name, last_name, job, street_number, street_name, ward_name, district_name, city_name, state_name, country_name, postcode, id_name, id_value, phone) = if is_vn {
+            let last = pick_weighted(&mut rng, WEIGHTED_SURNAMES_VN);
             let (middle, first) = if is_male {
                 (
                     middle_names_male_vn[rng.gen_range(0..middle_names_male_vn.len())],
@@ -150,9 +471,37 @@ pub fn generate_local_users(
             };
             let first_combined = format!("{} {}", middle, first);
             let job = jobs_vn[rng.gen_range(0..jobs_vn.len())];
-            let street = streets_vn[rng.gen_range(0..streets_vn.len())];
-            let city = cities_vn[rng.gen_range(0..cities_vn.len())];
-            (first_combined, last, job, street, city, "Vietnam")
+
+            // Hierarchical location matching Province -> District -> Ward -> Street
+            let prov = &PROVINCES_VN[rng.gen_range(0..PROVINCES_VN.len())];
+            let dist = &prov.districts[rng.gen_range(0..prov.districts.len())];
+            let ward = dist.wards[rng.gen_range(0..dist.wards.len())];
+            let street = dist.streets[rng.gen_range(0..dist.streets.len())];
+            let st_num = rng.gen_range(1..999);
+
+            // Ministry of Public Security compliant 12-digit CCCD
+            let cccd = generate_vietnamese_cccd(&mut rng, prov.code, birth_year, is_male);
+
+            // Valid 10-digit telco phone
+            let p_prefix = telco_prefixes_vn[rng.gen_range(0..telco_prefixes_vn.len())];
+            let p_num = format!("{}{:07}", p_prefix, rng.gen_range(1000000..9999999));
+
+            (
+                first_combined,
+                last,
+                job,
+                st_num,
+                street.to_string(),
+                ward.to_string(),
+                dist.name.to_string(),
+                prov.city.to_string(),
+                dist.name.to_string(),
+                "Vietnam".to_string(),
+                prov.zipcode.to_string(),
+                "CCCD",
+                cccd,
+                p_num,
+            )
         } else {
             let last = last_names_en[rng.gen_range(0..last_names_en.len())];
             let first = if is_male {
@@ -161,38 +510,41 @@ pub fn generate_local_users(
                 first_names_female_en[rng.gen_range(0..first_names_female_en.len())]
             };
             let job = jobs_en[rng.gen_range(0..jobs_en.len())];
-            let street = streets_en[rng.gen_range(0..streets_en.len())];
-            let city = cities_en[rng.gen_range(0..cities_en.len())];
-            (first.to_string(), last, job, street, city, "United States")
+
+            let us_loc = &US_LOCATIONS[rng.gen_range(0..US_LOCATIONS.len())];
+            let street = us_loc.streets[rng.gen_range(0..us_loc.streets.len())];
+            let st_num = rng.gen_range(10..999);
+
+            let ssn = format!("{:03}-{:02}-{:04}", rng.gen_range(100..900), rng.gen_range(10..99), rng.gen_range(1000..9999));
+            let p_num = format!("+1 ({:03}) {:03}-{:04}", rng.gen_range(201..999), rng.gen_range(200..999), rng.gen_range(1000..9999));
+
+            (
+                first.to_string(),
+                last,
+                job,
+                st_num,
+                street.to_string(),
+                "".to_string(),
+                us_loc.city.to_string(),
+                us_loc.city.to_string(),
+                us_loc.state.to_string(),
+                "United States".to_string(),
+                us_loc.zipcode.to_string(),
+                "SSN",
+                ssn,
+                p_num,
+            )
         };
 
-        let street_number = rng.gen_range(10..999);
-        let postcode = if is_vn {
-            format!("{:05}", rng.gen_range(70000..75000))
-        } else {
-            format!("{:05}", rng.gen_range(10000..99999))
-        };
-
-        let age = rng.gen_range(22..62);
-        let birth_year = 2026 - age;
-        let birth_month = rng.gen_range(1..=12);
-        let birth_day = rng.gen_range(1..=28);
-        let dob_str = format!("{:04}-{:02}-{:02}T08:00:00.000Z", birth_year, birth_month, birth_day);
-
+        // Strict RFC 5322 ASCII Email & Username sanitization
         let clean_first = to_ascii_slug(&full_first_name).replace('_', "");
         let clean_last = to_ascii_slug(last_name).replace('_', "");
         let random_suffix = rng.gen_range(10..999);
         let username = format!("{}_{}{}", clean_last, clean_first, random_suffix);
         let email = format!("{}.{}{}@tuquet.io", clean_first, clean_last, random_suffix);
-        let password = format!("Pass_{:04}!", rng.gen_range(1000..9999));
 
-        let phone_prefix = if is_vn {
-            let prefixes = ["090", "091", "098", "097", "032", "070", "079", "083", "088"];
-            prefixes[rng.gen_range(0..prefixes.len())]
-        } else {
-            "555-"
-        };
-        let phone = format!("{}{:07}", phone_prefix, rng.gen_range(1000000..9999999));
+        // Strong MMO Password (Upper, Lower, Number, Special - passes all strict reg rules)
+        let password = generate_mmo_password(&mut rng);
 
         let user_uuid = Uuid::new_v4().to_string();
 
@@ -226,13 +578,14 @@ pub fn generate_local_users(
             1 => "#4f46e5", // Indigo
             2 => "#059669", // Emerald
             3 => "#d97706", // Amber
-            4 => "#e11d48", // Rose
-            _ => "#7c3aed", // Violet
+            4 => "#7c3aed", // Violet
+            _ => "#e11d48", // Rose
         };
-        let inline_svg_data_uri = format!(
-            "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='28' fill='{}'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' fill='white' font-family='system-ui, sans-serif' font-size='36' font-weight='bold'>{}</text></svg>",
+        let inline_svg = format!(
+            "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><rect width='120' height='120' rx='28' fill='{}'/><text x='60' y='72' font-family='Arial, sans-serif' font-size='42' font-weight='bold' fill='#ffffff' text-anchor='middle' dominant-baseline='middle'>{}</text></svg>",
             bg_color, initials
         );
+        let inline_svg_data_uri = format!("data:image/svg+xml;utf8,{}", inline_svg);
 
         let user = json!({
             "gender": gender_str,
@@ -247,17 +600,19 @@ pub fn generate_local_users(
                     "number": street_number,
                     "name": street_name
                 },
+                "ward": ward_name,
+                "district": district_name,
                 "city": city_name,
-                "state": if is_vn { city_name } else { "California" },
+                "state": state_name,
                 "country": country_name,
                 "postcode": postcode,
                 "coordinates": {
-                    "latitude": format!("{:.4}", rng.gen_range(-80.0..80.0)),
-                    "longitude": format!("{:.4}", rng.gen_range(-170.0..170.0))
+                    "latitude": format!("{:.4}", rng.gen_range(10.0..21.0)),
+                    "longitude": format!("{:.4}", rng.gen_range(105.0..108.0))
                 },
                 "timezone": {
-                    "offset": "+07:00",
-                    "description": "UTC+7"
+                    "offset": if is_vn { "+07:00" } else { "-05:00" },
+                    "description": if is_vn { "Bangkok, Hanoi, Jakarta" } else { "Eastern Time (US & Canada)" }
                 }
             },
             "email": email,
@@ -281,8 +636,8 @@ pub fn generate_local_users(
             "phone": phone.clone(),
             "cell": phone,
             "id": {
-                "name": if is_vn { "CCCD" } else { "SSN" },
-                "value": format!("{:012}", rng.gen_range(100000000000_u64..999999999999_u64))
+                "name": id_name,
+                "value": id_value
             },
             "picture": {
                 "large": avatar_large,
@@ -340,17 +695,51 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_vietnamese_users() {
-        let data = generate_local_users(10, Some("male"), Some("VN"), Some("real"));
+    fn test_generate_vietnamese_users_mmo_compliance() {
+        let data = generate_local_users(20, Some("male"), Some("VN"), Some("real"));
         let list = data["results"].as_array().unwrap();
-        assert_eq!(list.len(), 10);
+        assert_eq!(list.len(), 20);
         for u in list {
             assert_eq!(u["gender"], "male");
             assert_eq!(u["nat"], "VN");
             assert!(u["job"].is_string());
             assert_eq!(u["id"]["name"], "CCCD");
+
+            let cccd = u["id"]["value"].as_str().unwrap();
+            assert_eq!(cccd.len(), 12, "CCCD must be exactly 12 digits");
+            assert!(cccd.chars().all(|c| c.is_ascii_digit()), "CCCD must be numeric");
+
+            // Verify century and gender digit in CCCD
+            let age = u["dob"]["age"].as_u64().unwrap() as u32;
+            let birth_year = 2026 - age;
+            let expected_gender_digit = if birth_year < 2000 { '0' } else { '2' };
+            assert_eq!(cccd.chars().nth(3).unwrap(), expected_gender_digit);
+
+            // Verify 2-digit birth year matches CCCD
+            let expected_year_suffix = format!("{:02}", birth_year % 100);
+            assert_eq!(&cccd[4..6], &expected_year_suffix);
+
+            // Verify Email is strictly ASCII
             let email = u["email"].as_str().unwrap();
             assert!(email.is_ascii(), "Vietnamese email must be strictly ASCII: {}", email);
+
+            // Verify Password has strong complexity
+            let password = u["login"]["password"].as_str().unwrap();
+            assert!(password.len() >= 10, "MMO password must be >= 10 chars");
+            assert!(password.chars().any(|c| c.is_ascii_uppercase()), "Password must have uppercase");
+            assert!(password.chars().any(|c| c.is_ascii_lowercase()), "Password must have lowercase");
+            assert!(password.chars().any(|c| c.is_ascii_digit()), "Password must have digits");
+            assert!(password.chars().any(|c| "@#$!&*".contains(c)), "Password must have special symbol");
+
+            // Verify Phone has 10 digits
+            let phone = u["phone"].as_str().unwrap();
+            assert_eq!(phone.len(), 10, "VN phone must have 10 digits");
+
+            // Verify Ward and District are populated
+            let ward = u["location"]["ward"].as_str().unwrap();
+            let district = u["location"]["district"].as_str().unwrap();
+            assert!(!ward.is_empty(), "Ward must not be empty");
+            assert!(!district.is_empty(), "District must not be empty");
         }
     }
 }
