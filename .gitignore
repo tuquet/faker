@@ -8,3 +8,5 @@ yarn-error.log*
 Thumbs.db
 src-tauri/target/
 dist/
+*.exe
+*.dll
