@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Sparkles, FileSpreadsheet, FileCode, Users, Globe, Cpu, UserCheck } from 'lucide-vue-next';
+import { Sparkles, FileSpreadsheet, FileCode, FolderArchive, Users, Globe, UserCheck } from 'lucide-vue-next';
 import { Button, Input } from '@tuquet/vue-ui';
 
 interface Props {
   count: number;
   gender: string;
   nat: string;
-  mode: 'auto' | 'api' | 'local';
   isLoading: boolean;
   totalLoaded: number;
 }
@@ -18,10 +16,10 @@ const emit = defineEmits<{
   (e: 'update:count', val: number): void;
   (e: 'update:gender', val: string): void;
   (e: 'update:nat', val: string): void;
-  (e: 'update:mode', val: 'auto' | 'api' | 'local'): void;
   (e: 'generate'): void;
   (e: 'exportCsv'): void;
   (e: 'exportJson'): void;
+  (e: 'exportBundle'): void;
 }>();
 
 const quickCounts = [1, 5, 10, 20, 50, 100];
@@ -41,7 +39,7 @@ const natOptions = [
 
 <template>
   <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <!-- 1. Count -->
       <div>
         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
@@ -108,25 +106,7 @@ const natOptions = [
             {{ opt.label }}
           </option>
         </select>
-        <p class="text-[11px] text-slate-400 mt-2">Việt Nam sẽ ưu tiên bộ từ điển tên tiếng Việt.</p>
-      </div>
-
-      <!-- 4. Engine Mode -->
-      <div>
-        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-          <Cpu class="w-3.5 h-3.5 text-sky-600" />
-          Động Cơ Sinh Dữ Liệu
-        </label>
-        <select
-          :value="mode"
-          @change="(e) => emit('update:mode', (e.target as HTMLSelectElement).value as any)"
-          class="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
-        >
-          <option value="auto">⚡ Tự động (API + Rust Fallback)</option>
-          <option value="local">🦀 100% Offline (Rust Core)</option>
-          <option value="api">🌐 Trực tuyến (randomuser.me)</option>
-        </select>
-        <p class="text-[11px] text-slate-400 mt-2">Chạy ngay cả khi ngắt kết nối Internet.</p>
+        <p class="text-[11px] text-slate-400 mt-2">Việt Nam ưu tiên từ điển họ tên, nghề nghiệp & CCCD.</p>
       </div>
     </div>
 
@@ -145,7 +125,7 @@ const natOptions = [
         </Button>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <Button
           variant="outline"
           size="sm"
@@ -154,7 +134,7 @@ const natOptions = [
           class="gap-1.5 font-medium"
         >
           <FileSpreadsheet class="w-4 h-4 text-emerald-600" />
-          <span>Xuất CSV (Excel)</span>
+          <span>Xuất CSV</span>
         </Button>
         <Button
           variant="outline"
@@ -165,6 +145,17 @@ const natOptions = [
         >
           <FileCode class="w-4 h-4 text-sky-600" />
           <span>Xuất JSON</span>
+        </Button>
+        <Button
+          variant="default"
+          size="sm"
+          :disabled="totalLoaded === 0 || isLoading"
+          @click="emit('exportBundle')"
+          class="gap-1.5 font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
+          title="Xuất trọn gói: CSV, JSON và toàn bộ file ảnh avatar SVG offline về máy"
+        >
+          <FolderArchive class="w-4 h-4 text-white" />
+          <span>Xuất Gói Hoàn Chỉnh (Bundle)</span>
         </Button>
       </div>
     </div>

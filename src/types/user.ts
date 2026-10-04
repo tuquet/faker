@@ -19,6 +19,7 @@ export interface UserPicture {
   large: string;
   medium: string;
   thumbnail: string;
+  data_uri?: string;
 }
 
 export interface UserLogin {
@@ -30,6 +31,11 @@ export interface UserLogin {
 export interface UserProfile {
   gender: string;
   name: UserName;
+  job?: string;
+  id?: {
+    name?: string;
+    value?: string;
+  };
   location: UserLocation;
   email: string;
   login: UserLogin;

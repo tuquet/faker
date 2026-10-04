@@ -4,11 +4,11 @@ import HeaderBar from './components/HeaderBar.vue';
 import FilterControls from './components/FilterControls.vue';
 import UserCardGrid from './components/UserCardGrid.vue';
 import UserDataTable from './components/UserDataTable.vue';
-import EventLogDrawer from './components/EventLogDrawer.vue';
-import type { UserProfile, LogEntry } from './types/user';
+import type { UserProfile } from './types/user';
 import {
   fetchUsersApi,
   saveFileDialog,
+  exportBundleDialog,
   logClientMessage,
   isTauri
 } from './services/tauri';
@@ -19,13 +19,10 @@ const users = ref<UserProfile[]>([]);
 const count = ref(10);
 const gender = ref('all');
 const nat = ref('all');
-const mode = ref<'auto' | 'api' | 'local'>('auto');
 const viewMode = ref<'cards' | 'table'>('cards');
 const isLoading = ref(false);
 const isFallback = ref(false);
-const sourceText = ref('');
-const isLogOpen = ref(false);
-const logs = ref<LogEntry[]>([]);
+const sourceText = ref('Offline Core (0ms)');
 
 // Toast Notification
 const toastMessage = ref('');
@@ -38,51 +35,30 @@ function showToast(msg: string) {
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
     isToastVisible.value = false;
-  }, 2200);
-}
-
-function addLog(level: 'INFO' | 'SUCCESS' | 'WARN' | 'ERROR', message: string) {
-  const now = new Date();
-  const time = `${now.toTimeString().split(' ')[0]}.${String(now.getMilliseconds()).padStart(3, '0')}`;
-  logs.value.push({
-    id: `${Date.now()}-${Math.random()}`,
-    time,
-    level,
-    message,
-  });
-  logClientMessage(level, message);
+  }, 2600);
 }
 
 // Generate Users
 async function handleGenerate() {
   if (isLoading.value) return;
   isLoading.value = true;
-  const startTime = Date.now();
-  addLog('INFO', `Bắt đầu sinh ${count.value} profiles (Gender: ${gender.value}, Nat: ${nat.value}, Mode: ${mode.value})...`);
 
   try {
     const res = await fetchUsersApi({
       count: count.value,
       gender: gender.value === 'all' ? undefined : gender.value,
       nat: nat.value === 'all' ? undefined : nat.value,
-      mode: mode.value,
     });
 
     users.value = res.results || [];
     isFallback.value = Boolean(res.offlineFallback);
-    sourceText.value = res.source || (isFallback.value ? 'Offline Rust' : 'API');
+    sourceText.value = res.source || 'Offline Core (0ms)';
 
-    const duration = Date.now() - startTime;
-    if (res.offlineFallback) {
-      addLog('WARN', `Hoàn tất với Rust Offline Generator (${duration}ms) - Nguồn: ${sourceText.value}`);
-      showToast(`Đã sinh ${users.value.length} profile (Offline Engine)!`);
-    } else {
-      addLog('SUCCESS', `Đã sinh thành công ${users.value.length} profile (${duration}ms) từ ${sourceText.value}`);
-      showToast(`Đã sinh ${users.value.length} profile thành công!`);
-    }
+    showToast(`Đã sinh ${users.value.length} profile thành công!`);
+    logClientMessage('INFO', `Sinh thành công ${users.value.length} profile.`);
   } catch (err: any) {
-    addLog('ERROR', `Lỗi khi sinh profile: ${err.message}`);
     showToast(`Lỗi: ${err.message}`);
+    logClientMessage('ERROR', `Lỗi khi sinh profile: ${err.message}`);
   } finally {
     isLoading.value = false;
   }
@@ -94,23 +70,18 @@ async function handleExportCsv() {
   const csvContent = generateCSV(users.value);
   const filename = `tuquet_users_${Date.now()}.csv`;
 
-  addLog('INFO', `Đang xuất ${users.value.length} dòng ra định dạng CSV...`);
-
   if (isTauri()) {
     try {
       const savedPath = await saveFileDialog(filename, csvContent, 'csv');
       if (savedPath) {
-        addLog('SUCCESS', `Đã lưu file CSV thành công tại: ${savedPath}`);
         showToast('Đã lưu file CSV thành công!');
-      } else {
-        addLog('INFO', 'Người dùng đã hủy hộp thoại lưu file CSV.');
+        logClientMessage('SUCCESS', `Lưu CSV tại ${savedPath}`);
       }
     } catch (err: any) {
-      addLog('ERROR', `Lỗi khi lưu file CSV: ${err.message}`);
+      showToast(`Lỗi khi lưu file CSV: ${err.message}`);
     }
   } else {
     downloadBrowserFile(csvContent, filename, 'text/csv;charset=utf-8;');
-    addLog('SUCCESS', `Đã tải xuống file ${filename} qua trình duyệt web.`);
     showToast('Đã tải xuống file CSV!');
   }
 }
@@ -121,24 +92,42 @@ async function handleExportJson() {
   const jsonContent = JSON.stringify(users.value, null, 2);
   const filename = `tuquet_users_${Date.now()}.json`;
 
-  addLog('INFO', `Đang xuất ${users.value.length} dòng ra định dạng JSON...`);
-
   if (isTauri()) {
     try {
       const savedPath = await saveFileDialog(filename, jsonContent, 'json');
       if (savedPath) {
-        addLog('SUCCESS', `Đã lưu file JSON thành công tại: ${savedPath}`);
         showToast('Đã lưu file JSON thành công!');
-      } else {
-        addLog('INFO', 'Người dùng đã hủy hộp thoại lưu file JSON.');
+        logClientMessage('SUCCESS', `Lưu JSON tại ${savedPath}`);
       }
     } catch (err: any) {
-      addLog('ERROR', `Lỗi khi lưu file JSON: ${err.message}`);
+      showToast(`Lỗi khi lưu file JSON: ${err.message}`);
     }
   } else {
     downloadBrowserFile(jsonContent, filename, 'application/json');
-    addLog('SUCCESS', `Đã tải xuống file ${filename} qua trình duyệt web.`);
     showToast('Đã tải xuống file JSON!');
+  }
+}
+
+// Export Complete Asset Bundle (CSV + JSON + Local SVG Avatars)
+async function handleExportBundle() {
+  if (users.value.length === 0) return;
+
+  if (isTauri()) {
+    try {
+      const savedFolder = await exportBundleDialog(users.value);
+      if (savedFolder) {
+        showToast('Đã xuất trọn gói dữ liệu & avatar SVG vào thư mục!');
+        logClientMessage('SUCCESS', `Xuất Bundle thành công tại ${savedFolder}`);
+      }
+    } catch (err: any) {
+      showToast(`Lỗi xuất gói: ${err.message}`);
+      logClientMessage('ERROR', `Lỗi xuất gói: ${err.message}`);
+    }
+  } else {
+    // Browser fallback: download both CSV and JSON
+    handleExportCsv();
+    setTimeout(() => handleExportJson(), 500);
+    showToast('Đang tải dữ liệu CSV & JSON qua trình duyệt...');
   }
 }
 
@@ -147,7 +136,6 @@ function onCopied(field: string) {
 }
 
 onMounted(() => {
-  addLog('INFO', `Ứng dụng khởi động (${isTauri() ? 'Tauri Native Desktop' : 'Web Vite Dev'})`);
   handleGenerate();
 });
 </script>
@@ -160,9 +148,6 @@ onMounted(() => {
       @update:view-mode="(mode) => (viewMode = mode)"
       :is-generating="isLoading"
       :total-count="users.length"
-      :log-count="logs.length"
-      :is-log-open="isLogOpen"
-      @toggle-log="isLogOpen = !isLogOpen"
       :source-text="sourceText"
       :is-fallback="isFallback"
     />
@@ -177,13 +162,12 @@ onMounted(() => {
         @update:gender="(v) => (gender = v)"
         :nat="nat"
         @update:nat="(v) => (nat = v)"
-        :mode="mode"
-        @update:mode="(v) => (mode = v)"
         :is-loading="isLoading"
         :total-loaded="users.length"
         @generate="handleGenerate"
         @export-csv="handleExportCsv"
         @export-json="handleExportJson"
+        @export-bundle="handleExportBundle"
       />
 
       <!-- Content Views (Cards vs Table) -->
@@ -212,18 +196,10 @@ onMounted(() => {
         </div>
         <h3 class="font-bold text-slate-800 text-sm">Chưa có profile nào</h3>
         <p class="text-xs text-slate-500 max-w-sm mx-auto">
-          Nhấn nút "Sinh Profile Mới" ở trên để tạo dữ liệu ngẫu nhiên với động cơ trực tuyến hoặc offline.
+          Nhấn nút "Sinh Profile Mới" ở trên để tạo dữ liệu ngẫu nhiên với động cơ offline siêu tốc.
         </p>
       </div>
     </main>
-
-    <!-- Event Log Drawer -->
-    <EventLogDrawer
-      :is-open="isLogOpen"
-      :logs="logs"
-      @close="isLogOpen = false"
-      @clear="logs = []"
-    />
 
     <!-- Global Floating Toast Notification -->
     <transition

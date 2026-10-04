@@ -57,12 +57,14 @@ const filteredUsers = computed(() => {
   if (q) {
     list = list.filter((u) => {
       const name = getFullName(u).toLowerCase();
+      const job = (u.job || '').toLowerCase();
       const email = (u.email || '').toLowerCase();
       const phone = (u.phone || '').toLowerCase();
       const city = (u.location?.city || '').toLowerCase();
       const user = (u.login?.username || '').toLowerCase();
       return (
         name.includes(q) ||
+        job.includes(q) ||
         email.includes(q) ||
         phone.includes(q) ||
         city.includes(q) ||
@@ -184,7 +186,8 @@ const paginatedUsers = computed(() => {
               />
             </td>
             <td class="py-2.5 px-4 font-semibold text-slate-900 whitespace-nowrap">
-              {{ getFullName(u) }}
+              <div>{{ getFullName(u) }}</div>
+              <div v-if="u.job" class="text-[11px] font-normal text-indigo-600">{{ u.job }}</div>
             </td>
             <td class="py-2.5 px-4 whitespace-nowrap">
               <Badge

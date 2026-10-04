@@ -1,4 +1,4 @@
-import type { FetchUsersParams, FetchUsersResponse } from '../types/user';
+import type { FetchUsersParams, FetchUsersResponse, UserProfile } from '../types/user';
 
 declare global {
   interface Window {
@@ -106,6 +106,15 @@ export async function saveFileDialog(
   return null;
 }
 
+export async function exportBundleDialog(users: UserProfile[]): Promise<string | null> {
+  if (isTauri()) {
+    return invokeTauri<string | null>('export_bundle_dialog', {
+      users,
+    });
+  }
+  return null;
+}
+
 export async function logClientMessage(level: string, message: string): Promise<void> {
   if (isTauri()) {
     try {
@@ -115,3 +124,4 @@ export async function logClientMessage(level: string, message: string): Promise<
     }
   }
 }
+

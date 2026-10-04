@@ -83,6 +83,9 @@ function getFullAddress(u: UserProfile): string {
             <h3 class="font-bold text-slate-900 text-sm truncate mt-1" :title="getFullName(u)">
               {{ getFullName(u) }}
             </h3>
+            <p v-if="u.job" class="text-xs font-semibold text-indigo-600 truncate mt-0.5" :title="u.job">
+              {{ u.job }}
+            </p>
             <p class="text-xs text-slate-500 truncate flex items-center gap-1 mt-0.5" :title="getFullAddress(u)">
               <MapPin class="w-3 h-3 text-slate-400 shrink-0" />
               <span class="truncate">{{ u.location?.city || u.location?.country || 'N/A' }}</span>

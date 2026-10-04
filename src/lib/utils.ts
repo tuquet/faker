@@ -34,35 +34,44 @@ export function generateCSV(users: UserProfile[]): string {
   const headers = [
     'STT',
     'Ho Ten',
+    'Chuc Danh',
     'Gioi Tinh',
     'Quoc Tich',
     'Email',
     'So Dien Thoai',
+    'Avatar URL',
     'Dia Chi',
     'Thanh Pho',
     'Quoc Gia',
+    'CCCD/SSN',
     'Username',
     'Password',
   ];
 
   const rows = users.map((u, i) => {
     const fullName = `${u.name?.title ? u.name.title + ' ' : ''}${u.name?.first || ''} ${u.name?.last || ''}`.trim();
+    const job = u.job || '';
+    const avatarUrl = u.picture?.large || u.picture?.medium || '';
     const street = `${u.location?.street?.number ? u.location.street.number + ' ' : ''}${u.location?.street?.name || ''}`.trim();
     const city = u.location?.city || '';
     const country = u.location?.country || '';
+    const idVal = u.id?.value || '';
 
-    const escapeCsv = (str: string) => `"${String(str || '').replace(/"/g, '""')}"`;
+    const escapeCsv = (str: string | number) => `"${String(str || '').replace(/"/g, '""')}"`;
 
     return [
       i + 1,
       escapeCsv(fullName),
+      escapeCsv(job),
       escapeCsv(u.gender || ''),
       escapeCsv(u.nat || ''),
       escapeCsv(u.email || ''),
       escapeCsv(u.phone || ''),
+      escapeCsv(avatarUrl),
       escapeCsv(street),
       escapeCsv(city),
       escapeCsv(country),
+      escapeCsv(idVal),
       escapeCsv(u.login?.username || ''),
       escapeCsv(u.login?.password || ''),
     ].join(',');

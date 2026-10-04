@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { LayoutGrid, TableProperties, Terminal, CheckCircle2, Loader2 } from 'lucide-vue-next';
-import { Button, Badge } from '@tuquet/vue-ui';
+import { LayoutGrid, TableProperties, CheckCircle2, Loader2, Zap } from 'lucide-vue-next';
+import { Badge } from '@tuquet/vue-ui';
 
 interface Props {
   viewMode: 'cards' | 'table';
   isGenerating: boolean;
   totalCount: number;
-  logCount: number;
-  isLogOpen: boolean;
   sourceText?: string;
   isFallback?: boolean;
 }
@@ -16,7 +14,6 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   (e: 'update:viewMode', mode: 'cards' | 'table'): void;
-  (e: 'toggleLog'): void;
 }>();
 </script>
 
@@ -40,7 +37,7 @@ const emit = defineEmits<{
             </Badge>
           </div>
           <p class="text-xs text-slate-500">
-            Tauri v2 + Vue 3 + Tuquet Lib UI • {{ totalCount }} profile hiện tại
+            Tauri v2 + Vue 3 • {{ totalCount }} profile hiện tại
           </p>
         </div>
       </div>
@@ -52,13 +49,9 @@ const emit = defineEmits<{
           <Loader2 class="w-3.5 h-3.5 animate-spin" />
           <span>Đang sinh dữ liệu...</span>
         </Badge>
-        <Badge v-else-if="isFallback" variant="outline" class="gap-1.5 py-1 bg-amber-50 text-amber-700 border-amber-200">
-          <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-          <span>Offline Rust Core</span>
-        </Badge>
         <Badge v-else variant="outline" class="gap-1.5 py-1 bg-emerald-50 text-emerald-700 border-emerald-200">
-          <CheckCircle2 class="w-3.5 h-3.5" />
-          <span>{{ sourceText || 'Ready' }}</span>
+          <Zap class="w-3.5 h-3.5 text-emerald-600" />
+          <span>{{ sourceText || 'Offline Core (0ms)' }}</span>
         </Badge>
 
         <!-- View Mode Switcher -->
@@ -66,7 +59,7 @@ const emit = defineEmits<{
           <button
             @click="emit('update:viewMode', 'cards')"
             :class="[
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all',
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer',
               viewMode === 'cards'
                 ? 'bg-white text-sky-700 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -79,7 +72,7 @@ const emit = defineEmits<{
           <button
             @click="emit('update:viewMode', 'table')"
             :class="[
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all',
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer',
               viewMode === 'table'
                 ? 'bg-white text-sky-700 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
@@ -90,23 +83,6 @@ const emit = defineEmits<{
             <span class="hidden sm:inline">Data Table</span>
           </button>
         </div>
-
-        <!-- Terminal Log Drawer Toggle -->
-        <Button
-          variant="outline"
-          size="sm"
-          class="gap-1.5 font-medium text-xs relative"
-          @click="emit('toggleLog')"
-        >
-          <Terminal class="w-3.5 h-3.5 text-slate-500" />
-          <span class="hidden md:inline">Logs</span>
-          <span
-            v-if="logCount > 0"
-            class="ml-1 px-1.5 py-0.2 bg-slate-200 rounded-full text-[10px] font-mono text-slate-700"
-          >
-            {{ logCount }}
-          </span>
-        </Button>
       </div>
     </div>
   </header>
