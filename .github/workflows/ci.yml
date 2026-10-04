@@ -1,4 +1,4 @@
-name: CI (Test, Build & Lint)
+name: CI
 
 on:
   push:
@@ -14,62 +14,48 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Test & Build Frontend & Rust Core
+  test-and-build:
+    name: Test & Build Validation
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            src-tauri/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 10
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: x86_64-pc-windows-msvc
+          cache: 'pnpm'
 
       - name: Install Frontend Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build Frontend
-        run: pnpm build
+      - name: Typecheck & Vite Build
+        run: pnpm run build
 
-      - name: Run Rust Core Tests
-        run: cargo test --manifest-path src-tauri/Cargo.toml --verbose
-
-  notify:
-    name: Notify Telegram
-    needs: [test]
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send Telegram Notification
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      - name: Run Rust Backend Unit Tests
         run: |
-          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
-            echo "Telegram credentials not found, skipping notification."
-            exit 0
-          fi
-          STATUS="${{ needs.test.result }}"
-          if [ "$STATUS" = "success" ]; then
-            EMOJI="✅"
-            MSG="CI Build & Tests passed for <b>random-user-generator</b>"
-          else
-            EMOJI="❌"
-            MSG="CI Build & Tests failed for <b>random-user-generator</b>"
-          fi
-          curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
-            -d "chat_id=${TELEGRAM_CHAT_ID}" \
-            -d "text=${EMOJI} <b>[Tuquet CI]</b> ${MSG}" \
-            -d "parse_mode=HTML" > /dev/null
+          cd src-tauri
+          cargo test --verbose
