@@ -1,104 +1,71 @@
-# 👤 Random User Generator - Local Suite
+# 🦀 Random User Generator - Tauri Desktop Suite
 
-Ứng dụng Web App cục bộ (Localhost) và API sinh dữ liệu người dùng ảo (Họ tên, Email, Số điện thoại, Địa chỉ, Avatar, Tài khoản/Mật khẩu) phục vụ test web, tạo mock data, seeding database hoặc làm tài khoản ảo.
+Ứng dụng **Desktop Native (Windows)** siêu nhẹ, khởi động tức thì, tiêu thụ cực ít tài nguyên để sinh dữ liệu người dùng ảo (Họ tên, Email, Số điện thoại, Địa chỉ, Avatar, Tài khoản/Mật khẩu) phục vụ test web, tạo mock data, seeding database.
 
-Dự án tích hợp trực tiếp **API RandomUser.me** (Online) và **Local Faker Generator** (Offline), đảm bảo hoạt động liên tục ngay cả khi mất mạng internet hoặc bị chặn IP.
+Ứng dụng được xây dựng trên nền tảng **Tauri v2 + Rust Core** kết hợp giao diện **Tailwind CSS**, thay thế hoàn toàn việc phải mở trình duyệt web localhost cồng kềnh.
 
 ---
 
-## 🌟 Tính năng nổi bật
+## ⚡ Ưu điểm vượt trội của bản Tauri Desktop
 
-1. **Giao diện hiện đại & tiện dụng (Tailwind CSS)**:
-   - Chế độ **Thẻ Profile (Cards)**: Hiển thị avatar, đầy đủ thông tin chi tiết.
-   - Chế độ **Bảng dữ liệu (Table)**: Xem hàng loạt, sắp xếp, lọc nhanh.
-   - Chế độ **Raw JSON**: Copy trực tiếp payload cho Developer.
-2. **Sao chép 1-Click**:
-   - Nhấp vào bất kỳ trường nào (Email, Mật khẩu, SĐT, Địa chỉ, JSON) là tự động copy vào Clipboard.
-3. **Bộ lọc đa dạng**:
-   - Số lượng (1 - 500 profiles).
-   - Giới tính (Nam / Nữ / Ngẫu nhiên).
-   - Quốc gia / Ngôn ngữ (Việt Nam `VN`, Mỹ `US`, Anh `GB`, Pháp `FR`, Đức `DE`, Nhật `JP`, v.v.).
-4. **Offline Fallback (Hoạt động không cần mạng)**:
-   - Nếu không có internet hoặc RandomUser.me phản hồi chậm, hệ thống tự động chuyển sang bộ sinh dữ liệu cục bộ bằng `@faker-js/faker`.
-5. **Xuất file nhanh**:
-   - Xuất ra file **Excel / CSV** chuẩn UTF-8 (mở bằng Microsoft Excel không bị lỗi font tiếng Việt).
-   - Xuất ra file **JSON**.
-6. **Tích hợp API cục bộ cho Developer**:
-   - Bạn có thể gọi API trực tiếp từ backend hoặc postman: `GET http://localhost:3000/api/users?results=20&nat=vn`.
+* 🪶 **Siêu nhẹ & Tiết kiệm RAM**: Chiếm chỉ ~**30MB RAM** (so với 300–500MB của Electron/Chrome).
+* 🖥️ **Cửa sổ phần mềm Native**: Hoạt động như một app Windows thực thụ (`.exe`), không cần mở trình duyệt, không lo xung đột Port.
+* 💾 **Hộp thoại lưu file Windows Native**: Khi bấm xuất CSV/JSON, xuất hiện hộp thoại **Save File As...** của Windows để bạn chọn vị trí lưu file trực tiếp.
+* 🛡️ **Bảo mật & Không CORS**: Rust Core gọi API trực tiếp, không bị chặn CORS hay giới hạn của trình duyệt.
+* 🔌 **Offline Engine bằng Rust**: Tích hợp sẵn bộ sinh dữ liệu ngẫu nhiên bằng Rust nội bộ (có tên & địa chỉ Việt Nam + Quốc tế), hoạt động mượt mà ngay cả khi ngắt kết nối mạng.
 
 ---
 
 ## 🚀 Cách chạy ứng dụng
 
-### Cách 1: Nhanh nhất trên Windows (1-Click)
-* Nhấp đúp chuột vào file **`start.bat`**.
-* Trình duyệt sẽ tự động mở trang web tại địa chỉ: `http://localhost:3000`.
+### 1. Khởi động chế độ Desktop (Nhanh nhất)
+Nhấp đúp chuột vào file:
+👉 **`run-desktop.bat`** *(hoặc chạy `npm run desktop` trong terminal)*.
+> Cửa sổ phần mềm sẽ xuất hiện trực tiếp trên màn hình.
 
 ---
 
-### Cách 2: Chạy qua dòng lệnh (Terminal / PowerShell)
-
-```bash
-# 1. Di chuyển vào thư mục dự án
-cd D:\Repository\tuquet\random-user-generator
-
-# 2. Cài đặt thư viện (chỉ cần chạy lần đầu)
-npm install
-
-# 3. Khởi động ứng dụng
-npm start
-```
-
-*Mở trình duyệt truy cập: **`http://localhost:3000`***
+### 2. Đóng gói thành file `.EXE` độc lập (Portable / Installer)
+Nhấp đúp chuột vào file:
+👉 **`build-exe.bat`** *(hoặc chạy `npm run build:exe`)*.
+> File `.exe` cài đặt sẽ được tạo ra tại: `src-tauri\target\release\`. Bạn có thể copy file này sang máy khác sử dụng trực tiếp mà không cần cài thêm Node.js hay Rust.
 
 ---
 
-## 📡 Tài liệu API Endpoint (Local REST API)
-
-Nếu bạn muốn tích hợp vào tool hoặc web khác, bạn có thể gọi thẳng vào Localhost:
-
-### 1. Lấy danh sách Users ngẫu nhiên
-* **URL**: `GET /api/users`
-* **Tham số (Query parameters)**:
-  * `results` (number): Số lượng users cần sinh (mặc định: `10`, tối đa `5000`).
-  * `gender` (string): `male` hoặc `female`.
-  * `nat` (string): Mã quốc gia (`vn`, `us`, `gb`, `fr`, `de`, `jp`...).
-  * `mode` (string):
-    * `auto` (mặc định): Thử API trước, nếu lỗi chuyển offline.
-    * `local`: Tạo offline ngay lập tức siêu tốc.
-    * `api`: Bắt buộc dùng API randomuser.me.
-
-**Ví dụ cURL:**
-```bash
-curl "http://localhost:3000/api/users?results=5&nat=vn"
-```
-
-### 2. Xuất dữ liệu ra file CSV
-* **URL**: `POST /api/export/csv`
-* **Body (JSON)**:
-  ```json
-  {
-    "users": [ ... ]
-  }
-  ```
-* **Trả về**: File CSV đính kèm tải xuống (`attachment`).
+### 3. Chế độ Web Server (Tùy chọn phụ)
+Nếu vẫn muốn chạy dưới dạng Web Localhost trên trình duyệt:
+* Chạy file **`start.bat`** (Mở tại `http://localhost:3500`).
 
 ---
 
-## 📁 Cấu trúc thư mục
+## 📁 Cấu trúc dự án (Tauri Architecture)
 
 ```text
 random-user-generator/
-├── public/                 # Giao diện người dùng Web App
-│   ├── index.html          # File HTML chính (Tailwind CSS, Font Awesome)
-│   ├── app.js              # Xử lý tương tác, filter, copy, xuất file
-│   └── style.css           # Hiệu ứng và tinh chỉnh CSS
-├── src/                    # Backend Node.js
-│   ├── server.js           # Express Server & REST API endpoints
-│   ├── localGenerator.js   # Module sinh dữ liệu offline (Faker)
-│   └── exporter.js         # Tiện ích chuyển đổi sang CSV/Excel UTF-8
-├── start.bat               # File khởi động 1-click cho Windows
-├── install.bat             # File cài đặt thư viện 1-click
-├── package.json            # Cấu hình dự án và dependencies
-└── README.md               # Tài liệu hướng dẫn
+├── src-tauri/                 # RUST CORE (Tauri Backend)
+│   ├── Cargo.toml             # Khai báo crate: tauri, reqwest, rfd, serde
+│   ├── tauri.conf.json        # Cấu hình cửa sổ, quyền hạn (capabilities)
+│   ├── build.rs               # Script build của Tauri
+│   ├── icons/                 # Bộ icon chuẩn đa nền tảng
+│   └── src/
+│       ├── main.rs            # Entry point Windows subsystem
+│       ├── lib.rs             # Tauri Commands (fetch_users, save_file_dialog)
+│       └── generator.rs       # Rust Offline Mock Data Generator (VN & Quốc tế)
+├── public/                    # FRONTEND (Giao diện người dùng)
+│   ├── index.html             # Giao diện Cards / Table / JSON (Tailwind)
+│   ├── app.js                 # Cầu nối Tauri IPC (`window.__TAURI__.core`)
+│   └── style.css              # Custom styling & hiệu ứng
+├── run-desktop.bat            # 1-Click mở ứng dụng Desktop (Tauri dev)
+├── build-exe.bat              # 1-Click build file .exe độc lập
+├── start.bat                  # Chạy dạng web server localhost
+├── package.json               # Cấu hình npm & tauri scripts
+└── README.md                  # Tài liệu hướng dẫn
 ```
+
+---
+
+## 🛠️ Danh sách Tauri Commands (Rust IPC)
+
+Frontend giao tiếp với Rust Core qua các lệnh:
+* `fetch_users(count, gender, nat, mode)`: Lấy dữ liệu từ `randomuser.me` hoặc tự động sinh offline bằng Rust nếu mất mạng.
+* `save_file_dialog(default_name, content, extension)`: Mở hộp thoại Windows Explorer để chọn nơi lưu file `.csv` hoặc `.json`.

@@ -5,7 +5,10 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "node --watch src/server.js"
+    "dev": "node --watch src/server.js",
+    "tauri": "tauri",
+    "desktop": "tauri dev",
+    "build:exe": "tauri build"
   },
   "keywords": [
     "randomuser",
@@ -21,5 +24,8 @@
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.1"
   }
 }

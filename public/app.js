@@ -1,3 +1,6 @@
+// Detect Tauri Environment
+const isTauri = typeof window !== 'undefined' && window.__TAURI__ && window.__TAURI__.core;
+
 // App State
 let currentUsers = [];
 let filteredUsers = [];
@@ -28,8 +31,18 @@ const loadingState = document.getElementById('loadingState');
 const resultCount = document.getElementById('resultCount');
 const loadTime = document.getElementById('loadTime');
 const sourceInfo = document.getElementById('sourceInfo');
+const statusBadge = document.getElementById('statusBadge');
 const toast = document.getElementById('toast');
 const toastMsg = document.getElementById('toastMsg');
+
+// Update Status Badge if running inside Native Tauri
+if (isTauri) {
+  statusBadge.innerHTML = `
+    <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+    Tauri Native v2
+  `;
+  statusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200';
+}
 
 // Toast Notification
 function showToast(message) {
@@ -37,7 +50,7 @@ function showToast(message) {
   toast.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
   setTimeout(() => {
     toast.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
-  }, 2200);
+  }, 2800);
 }
 
 // Copy to Clipboard
@@ -68,11 +81,11 @@ function setTab(tab) {
   jsonContainer.classList.toggle('hidden', tab !== 'json');
 }
 
-// Fetch Random Users
+// Fetch Random Users (Supports Tauri IPC & Fallback HTTP)
 async function fetchUsers() {
   const count = parseInt(inputCount.value, 10) || 10;
-  const gender = selectGender.value;
-  const nat = selectNat.value === 'all' ? '' : selectNat.value;
+  const gender = selectGender.value || null;
+  const nat = selectNat.value === 'all' ? null : selectNat.value;
   const mode = selectMode.value;
 
   loadingState.classList.remove('hidden');
@@ -83,16 +96,29 @@ async function fetchUsers() {
   const startTime = performance.now();
 
   try {
-    const url = new URL('/api/users', window.location.origin);
-    url.searchParams.set('results', count);
-    if (gender) url.searchParams.set('gender', gender);
-    if (nat) url.searchParams.set('nat', nat);
-    if (mode) url.searchParams.set('mode', mode);
+    let data;
 
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    if (isTauri) {
+      // Direct Native Rust IPC Call!
+      data = await window.__TAURI__.core.invoke('fetch_users', {
+        count: count,
+        gender: gender,
+        nat: nat,
+        mode: mode
+      });
+    } else {
+      // Browser fallback (Express server)
+      const url = new URL('/api/users', window.location.origin);
+      url.searchParams.set('results', count);
+      if (gender) url.searchParams.set('gender', gender);
+      if (nat) url.searchParams.set('nat', nat);
+      if (mode) url.searchParams.set('mode', mode);
 
-    const data = await res.json();
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      data = await res.json();
+    }
+
     const endTime = performance.now();
 
     currentUsers = data.results || [];
@@ -103,7 +129,8 @@ async function fetchUsers() {
     loadTime.textContent = `${elapsed} ms`;
     resultCount.textContent = `${currentUsers.length} profiles`;
     sourceInfo.textContent = data.source || (data.offlineFallback ? 'Offline' : 'API');
-    if (data.offlineFallback) {
+    
+    if (data.offlineFallback || (data.source && data.source.includes('offline'))) {
       sourceInfo.className = 'px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-mono text-[11px]';
     } else {
       sourceInfo.className = 'px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono text-[11px]';
@@ -155,7 +182,7 @@ function renderCards(users) {
         <div>
           <!-- Header: Avatar + Main Name -->
           <div class="flex items-start space-x-3.5 pb-4 border-b border-slate-100">
-            <img src="${avatar}" alt="${name}" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-slate-100 shadow-sm">
+            <img src="${avatar}" alt="${name}" class="w-14 h-14 rounded-2xl object-cover ring-2 ring-slate-100 shadow-sm" onerror="this.src='https://via.placeholder.com/150'">
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
                 <span class="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">
@@ -239,7 +266,7 @@ function renderTable(users) {
     return `
       <tr class="hover:bg-slate-50 transition">
         <td class="px-4 py-2.5">
-          <img src="${avatar}" alt="" class="w-8 h-8 rounded-full object-cover border border-slate-200">
+          <img src="${avatar}" alt="" class="w-8 h-8 rounded-full object-cover border border-slate-200" onerror="this.src='https://via.placeholder.com/40'">
         </td>
         <td class="px-4 py-2.5 font-semibold text-slate-900">${name}</td>
         <td class="px-4 py-2.5 capitalize">${u.gender}</td>
@@ -267,49 +294,126 @@ function renderJSON(users) {
   rawJsonBlock.textContent = JSON.stringify(users, null, 2);
 }
 
+// Format CSV String with UTF-8 BOM
+function generateCSVString(users) {
+  if (!users.length) return '';
+  const headers = [
+    'Title', 'First Name', 'Last Name', 'Gender', 'Email',
+    'Phone', 'Cell', 'Street', 'City', 'State', 'Country',
+    'Postcode', 'Age', 'DOB', 'Username', 'Password', 'UUID', 'Nationality'
+  ];
+
+  const escapeCSV = (val) => {
+    if (val === null || val === undefined) return '""';
+    const str = String(val).replace(/"/g, '""');
+    return `"${str}"`;
+  };
+
+  const rows = users.map((u) => {
+    const street = u.location?.street
+      ? `${u.location.street.number || ''} ${u.location.street.name || ''}`.trim()
+      : '';
+
+    return [
+      escapeCSV(u.name?.title || ''),
+      escapeCSV(u.name?.first || ''),
+      escapeCSV(u.name?.last || ''),
+      escapeCSV(u.gender || ''),
+      escapeCSV(u.email || ''),
+      escapeCSV(u.phone || ''),
+      escapeCSV(u.cell || ''),
+      escapeCSV(street),
+      escapeCSV(u.location?.city || ''),
+      escapeCSV(u.location?.state || ''),
+      escapeCSV(u.location?.country || ''),
+      escapeCSV(u.location?.postcode || ''),
+      escapeCSV(u.dob?.age || ''),
+      escapeCSV(u.dob?.date ? u.dob.date.split('T')[0] : ''),
+      escapeCSV(u.login?.username || ''),
+      escapeCSV(u.login?.password || ''),
+      escapeCSV(u.login?.uuid || ''),
+      escapeCSV(u.nat || '')
+    ].join(',');
+  });
+
+  return '\uFEFF' + [headers.map(escapeCSV).join(','), ...rows].join('\r\n');
+}
+
 // Export to CSV
-function exportCSV() {
+async function exportCSV() {
   if (!currentUsers.length) {
     showToast('Chưa có dữ liệu để xuất!');
     return;
   }
 
-  fetch('/api/export/csv', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ users: currentUsers })
-  })
-  .then(res => res.blob())
-  .then(blob => {
+  const csvContent = generateCSVString(currentUsers);
+  const defaultName = `random-users-${Date.now()}.csv`;
+
+  if (isTauri) {
+    // Native Windows File Dialog
+    try {
+      const savedPath = await window.__TAURI__.core.invoke('save_file_dialog', {
+        defaultName: defaultName,
+        content: csvContent,
+        extension: 'csv'
+      });
+      if (savedPath) {
+        showToast(`Đã lưu file thành công!`);
+      }
+    } catch (err) {
+      console.error('Tauri save dialog error:', err);
+      showToast('Lỗi khi lưu file!');
+    }
+  } else {
+    // Browser blob download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `random-users-${Date.now()}.csv`;
+    a.download = defaultName;
     document.body.appendChild(a);
     a.click();
     a.remove();
     showToast('Đã tải xuống file CSV!');
-  })
-  .catch(err => {
-    console.error('Export CSV error:', err);
-    showToast('Lỗi khi xuất file CSV!');
-  });
+  }
 }
 
 // Export to JSON
-function exportJSON() {
+async function exportJSON() {
   if (!currentUsers.length) {
     showToast('Chưa có dữ liệu để xuất!');
     return;
   }
-  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentUsers, null, 2));
-  const a = document.createElement('a');
-  a.href = dataStr;
-  a.download = `random-users-${Date.now()}.json`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  showToast('Đã tải xuống file JSON!');
+
+  const jsonContent = JSON.stringify(currentUsers, null, 2);
+  const defaultName = `random-users-${Date.now()}.json`;
+
+  if (isTauri) {
+    // Native Windows File Dialog
+    try {
+      const savedPath = await window.__TAURI__.core.invoke('save_file_dialog', {
+        defaultName: defaultName,
+        content: jsonContent,
+        extension: 'json'
+      });
+      if (savedPath) {
+        showToast(`Đã lưu file thành công!`);
+      }
+    } catch (err) {
+      console.error('Tauri save dialog error:', err);
+      showToast('Lỗi khi lưu file!');
+    }
+  } else {
+    // Browser blob download
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonContent);
+    const a = document.createElement('a');
+    a.href = dataStr;
+    a.download = defaultName;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    showToast('Đã tải xuống file JSON!');
+  }
 }
 
 // Client-side quick filter
