@@ -1,71 +1,95 @@
-# 🦀 Random User Generator - Tauri Desktop Suite
+<div align="center">
+  <img src="https://tuquet.github.io/icons/random-user-generator.svg" width="76" height="76" alt="Random User Generator Logo" />
+  <h1>Random User Generator</h1>
+  <p><strong>Ultra-Fast Native Desktop &amp; Offline Mock User Suite in Tauri v2 &amp; Vue 3</strong></p>
 
-Ứng dụng **Desktop Native (Windows)** siêu nhẹ, khởi động tức thì, tiêu thụ cực ít tài nguyên để sinh dữ liệu người dùng ảo (Họ tên, Email, Số điện thoại, Địa chỉ, Avatar, Tài khoản/Mật khẩu) phục vụ test web, tạo mock data, seeding database.
-
-Ứng dụng được xây dựng trên nền tảng **Tauri v2 + Rust Core** kết hợp giao diện **Tailwind CSS**, thay thế hoàn toàn việc phải mở trình duyệt web localhost cồng kềnh.
-
----
-
-## ⚡ Ưu điểm vượt trội của bản Tauri Desktop
-
-* 🪶 **Siêu nhẹ & Tiết kiệm RAM**: Chiếm chỉ ~**30MB RAM** (so với 300–500MB của Electron/Chrome).
-* 🖥️ **Cửa sổ phần mềm Native**: Hoạt động như một app Windows thực thụ (`.exe`), không cần mở trình duyệt, không lo xung đột Port.
-* 💾 **Hộp thoại lưu file Windows Native**: Khi bấm xuất CSV/JSON, xuất hiện hộp thoại **Save File As...** của Windows để bạn chọn vị trí lưu file trực tiếp.
-* 🛡️ **Bảo mật & Không CORS**: Rust Core gọi API trực tiếp, không bị chặn CORS hay giới hạn của trình duyệt.
-* 🔌 **Offline Engine bằng Rust**: Tích hợp sẵn bộ sinh dữ liệu ngẫu nhiên bằng Rust nội bộ (có tên & địa chỉ Việt Nam + Quốc tế), hoạt động mượt mà ngay cả khi ngắt kết nối mạng.
+  <p>
+    <a href="https://v2.tauri.app/"><img src="https://img.shields.io/badge/Tauri-v2-blue.svg?logo=tauri" alt="Tauri v2" /></a>
+    <a href="https://vuejs.org/"><img src="https://img.shields.io/badge/Vue-3.5-emerald.svg?logo=vuedotjs" alt="Vue 3" /></a>
+    <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-Core-orange.svg?logo=rust" alt="Rust" /></a>
+    <a href="https://github.com/tuquet/lib"><img src="https://img.shields.io/badge/Design%20System-Tuquet%20Lib%20UI-cyan.svg" alt="Tuquet Lib UI" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" /></a>
+  </p>
+</div>
 
 ---
 
-## 🚀 Cách chạy ứng dụng
-
-### 1. Khởi động chế độ Desktop (Nhanh nhất)
-Nhấp đúp chuột vào file:
-👉 **`run-desktop.bat`** *(hoặc chạy `npm run desktop` trong terminal)*.
-> Cửa sổ phần mềm sẽ xuất hiện trực tiếp trên màn hình.
+> Ứng dụng Desktop Native siêu nhẹ, sinh dữ liệu hồ sơ người dùng ảo (Họ tên, Email, Số điện thoại, Địa chỉ, Avatar, Tài khoản/Mật khẩu) phục vụ kiểm thử hệ thống, seeding database và mock API. Tích hợp trực tiếp **Vue 3**, **Tuquet Lib UI Design System**, và **Rust Offline Engine** vận hành ngay cả khi ngắt kết nối mạng.
 
 ---
 
-### 2. Đóng gói thành file `.EXE` độc lập (Portable / Installer)
-Nhấp đúp chuột vào file:
-👉 **`build-exe.bat`** *(hoặc chạy `npm run build:exe`)*.
-> File `.exe` cài đặt sẽ được tạo ra tại: `src-tauri\target\release\`. Bạn có thể copy file này sang máy khác sử dụng trực tiếp mà không cần cài thêm Node.js hay Rust.
+## ✨ Điểm Nổi Bật
+
+* 🪶 **Siêu Nhẹ & Tối Ưu RAM**: Tiêu thụ chỉ ~**30MB RAM** với nhân Tauri v2 (nhẹ hơn 10x so với giải pháp Electron).
+* 🎨 **Chuẩn Hệ Sinh Thái Tuquet**: Giao diện xây dựng trên nền tảng **Vue 3 + TypeScript + Tailwind CSS** và các nguyên lý component từ `@tuquet/lib` (`vue-ui`, `vue-table`).
+* 📊 **Chế Độ Xem Đa Năng**:
+  * **Card View**: Lưới thẻ trực quan với avatar, gắn thẻ quốc tịch, thông tin đăng nhập và copy 1-click.
+  * **Data Table View**: Bảng dữ liệu mật độ cao (High-Density) có tìm kiếm lọc tức thì, sắp xếp cột và phân trang.
+* ⚡ **Động Cơ Kép (Hybrid Engine)**:
+  * Trực tuyến: Đồng bộ thời gian thực từ `randomuser.me`.
+  * Ngoại tuyến: Tự động fallback sang **Rust Offline Generator** (hỗ trợ đầy đủ bộ từ điển tên tiếng Việt và các quốc gia).
+* 💾 **Xuất Dữ Liệu Native**: Xuất file CSV và JSON trực tiếp qua hộp thoại lưu file của hệ điều hành.
 
 ---
 
-### 3. Chế độ Web Server (Tùy chọn phụ)
-Nếu vẫn muốn chạy dưới dạng Web Localhost trên trình duyệt:
-* Chạy file **`start.bat`** (Mở tại `http://localhost:3500`).
-
----
-
-## 📁 Cấu trúc dự án (Tauri Architecture)
+## 📁 Cấu Trúc Dự Án
 
 ```text
 random-user-generator/
 ├── src-tauri/                 # RUST CORE (Tauri Backend)
-│   ├── Cargo.toml             # Khai báo crate: tauri, reqwest, rfd, serde
-│   ├── tauri.conf.json        # Cấu hình cửa sổ, quyền hạn (capabilities)
-│   ├── build.rs               # Script build của Tauri
-│   ├── icons/                 # Bộ icon chuẩn đa nền tảng
+│   ├── Cargo.toml             # Crate: tauri v2, reqwest, rfd, serde, tokio
+│   ├── tauri.conf.json        # Cấu hình cửa sổ, CSP bảo mật, dist mapping
 │   └── src/
-│       ├── main.rs            # Entry point Windows subsystem
-│       ├── lib.rs             # Tauri Commands (fetch_users, save_file_dialog)
-│       └── generator.rs       # Rust Offline Mock Data Generator (VN & Quốc tế)
-├── public/                    # FRONTEND (Giao diện người dùng)
-│   ├── index.html             # Giao diện Cards / Table / JSON (Tailwind)
-│   ├── app.js                 # Cầu nối Tauri IPC (`window.__TAURI__.core`)
-│   └── style.css              # Custom styling & hiệu ứng
-├── run-desktop.bat            # 1-Click mở ứng dụng Desktop (Tauri dev)
-├── build-exe.bat              # 1-Click build file .exe độc lập
-├── start.bat                  # Chạy dạng web server localhost
-├── package.json               # Cấu hình npm & tauri scripts
-└── README.md                  # Tài liệu hướng dẫn
+│       ├── main.rs            # Entrypoint native desktop
+│       ├── lib.rs             # Tauri IPC Handlers (fetch_users, save_file_dialog)
+│       └── generator.rs       # Bộ sinh dữ liệu Rust Offline
+├── src/                       # VUE 3 FRONTEND
+│   ├── components/            # Vue Components
+│   │   ├── ui/                # Tuquet UI Primitives (Button, Badge, Card, Input)
+│   │   ├── HeaderBar.vue      # Thanh điều hướng & trạng thái
+│   │   ├── FilterControls.vue # Bộ lọc số lượng, giới tính, quốc tịch
+│   │   ├── UserCardGrid.vue   # Chế độ hiển thị thẻ
+│   │   ├── UserDataTable.vue  # Chế độ bảng dữ liệu (Data Table)
+│   │   └── EventLogDrawer.vue # Bảng nhật ký sự kiện hệ thống
+│   ├── services/
+│   │   └── tauri.ts           # Cầu nối IPC an toàn (Tauri + Web Fallback)
+│   ├── types/
+│   │   └── user.ts            # TypeScript interfaces
+│   ├── App.vue                # Giao diện điều phối chính
+│   └── main.ts                # Bootstrap ứng dụng Vue
+├── vite.config.ts             # Vite bundler
+├── tailwind.config.ts         # Bảng màu chuẩn Tuquet
+└── package.json               # Quản lý bởi pnpm
 ```
 
 ---
 
-## 🛠️ Danh sách Tauri Commands (Rust IPC)
+## 🚀 Hướng Dẫn Phát Triển
 
-Frontend giao tiếp với Rust Core qua các lệnh:
-* `fetch_users(count, gender, nat, mode)`: Lấy dữ liệu từ `randomuser.me` hoặc tự động sinh offline bằng Rust nếu mất mạng.
-* `save_file_dialog(default_name, content, extension)`: Mở hộp thoại Windows Explorer để chọn nơi lưu file `.csv` hoặc `.json`.
+### 1. Cài đặt dependencies (pnpm)
+```bash
+pnpm install
+```
+
+### 2. Khởi chạy chế độ Web Dev
+```bash
+pnpm dev
+# Mở tại http://localhost:5173
+```
+
+### 3. Khởi chạy chế độ Desktop (Tauri Dev)
+```bash
+pnpm desktop
+```
+
+### 4. Đóng gói ứng dụng Desktop (.EXE)
+```bash
+pnpm build:desktop
+# File cài đặt hoặc portable exe được sinh ra tại src-tauri/target/release/
+```
+
+---
+
+## 📜 Giấy Phép
+
+Phát hành theo giấy phép **MIT**. Bản quyền thuộc về **Tuquet Team**.

@@ -1,31 +1,53 @@
 {
-  "name": "random-user-generator-app",
+  "name": "@tuquet/random-user-generator",
   "version": "1.0.0",
-  "description": "Local Web App & API to generate random mock user profiles with online API & offline fallback",
-  "main": "src/server.js",
+  "description": "Random User Generator Native Desktop Suite powered by Tauri v2, Vue 3, and Tuquet Lib UI",
+  "type": "module",
+  "packageManager": "pnpm@10.33.0",
+  "author": "Tuquet Team <dev@tuquet.io>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tuquet/random-user-generator.git"
+  },
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node --watch src/server.js",
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
     "tauri": "tauri",
     "desktop": "tauri dev",
-    "build:exe": "tauri build"
+    "build:desktop": "tauri build"
   },
   "keywords": [
-    "randomuser",
+    "tuquet",
+    "tauri",
+    "vue3",
     "mock-data",
-    "user-generator",
     "faker",
+    "desktop-app",
     "offline-tool"
   ],
-  "author": "",
-  "license": "MIT",
   "dependencies": {
-    "@faker-js/faker": "^9.5.0",
-    "axios": "^1.7.9",
-    "cors": "^2.8.5",
-    "express": "^4.21.2"
+    "@tanstack/vue-table": "^8.21.2",
+    "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/plugin-opener": "^2.2.0",
+    "@vueuse/core": "^12.8.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-vue-next": "^1.0.0",
+    "reka-ui": "^2.1.4",
+    "tailwind-merge": "^3.0.2",
+    "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^2.12.1"
+    "@tauri-apps/cli": "^2.2.7",
+    "@types/node": "^22.13.9",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.3",
+    "vite": "^6.2.0",
+    "vue-tsc": "^2.2.4"
   }
 }

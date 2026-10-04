@@ -1,8 +1,11 @@
 [package]
 name = "random-user-generator"
 version = "1.0.0"
-description = "Random User Generator Desktop App"
-authors = ["TuQuet"]
+description = "High-performance offline & online Random User Generator desktop application in Tauri v2 and Rust"
+authors = ["Tuquet Team"]
+license = "MIT"
+repository = "https://github.com/tuquet/random-user-generator"
+readme = "README.md"
 edition = "2021"
 
 [lib]
