@@ -20,6 +20,8 @@ const isTauri = getTauriInvoke() !== null;
 let currentUsers = [];
 let filteredUsers = [];
 let currentTab = 'cards';
+let logCount = 0;
+let logHistory = [];
 
 // DOM Elements
 const inputCount = document.getElementById('inputCount');
@@ -50,6 +52,58 @@ const statusBadge = document.getElementById('statusBadge');
 const toast = document.getElementById('toast');
 const toastMsg = document.getElementById('toastMsg');
 
+// Log Elements
+const logContent = document.getElementById('logContent');
+const logCounter = document.getElementById('logCounter');
+const btnClearLog = document.getElementById('btnClearLog');
+const btnCopyLog = document.getElementById('btnCopyLog');
+const btnToggleLog = document.getElementById('btnToggleLog');
+
+// Unified Logger (Screen + File app.log)
+function addLog(level, message) {
+  const now = new Date();
+  const timeStr = now.toTimeString().split(' ')[0] + '.' + String(now.getMilliseconds()).padStart(3, '0');
+  const logLine = `[${timeStr}] [${level}] ${message}`;
+  
+  logHistory.push(logLine);
+  logCount++;
+  if (logCounter) logCounter.textContent = `${logCount} sự kiện`;
+
+  if (logContent) {
+    const el = document.createElement('div');
+    if (level === 'ERROR') {
+      el.className = 'text-rose-400 font-bold';
+    } else if (level === 'SUCCESS') {
+      el.className = 'text-emerald-400';
+    } else if (level === 'WARN') {
+      el.className = 'text-amber-400';
+    } else {
+      el.className = 'text-slate-300';
+    }
+    el.textContent = logLine;
+    logContent.appendChild(el);
+    logContent.scrollTop = logContent.scrollHeight;
+  }
+
+  // Also forward to Rust file logger if in Tauri
+  const invoke = getTauriInvoke();
+  if (invoke) {
+    try {
+      invoke('log_client_message', { level, message }).catch(() => {});
+    } catch (e) {}
+  }
+}
+
+// Global Exception Catchers
+window.onerror = function (msg, url, line, col, err) {
+  addLog('ERROR', `Lỗi JavaScript: ${msg} (${line}:${col})`);
+  return false;
+};
+
+window.onunhandledrejection = function (event) {
+  addLog('ERROR', `Promise Rejection: ${event.reason}`);
+};
+
 // Update Status Badge if running inside Native Tauri
 if (isTauri) {
   statusBadge.innerHTML = `
@@ -57,6 +111,9 @@ if (isTauri) {
     Tauri Native v2
   `;
   statusBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200';
+  addLog('INFO', 'Phát hiện môi trường: Tauri Native v2 Runtime (có quyền gọi Rust Core)');
+} else {
+  addLog('INFO', 'Chạy ở chế độ Browser / Localhost');
 }
 
 // Toast Notification
@@ -73,6 +130,7 @@ function copyToClipboard(text, label = 'nội dung') {
   if (!text) return;
   navigator.clipboard.writeText(text).then(() => {
     showToast(`Đã sao chép ${label}!`);
+    addLog('INFO', `Đã copy ${label} vào clipboard`);
   }).catch(() => {
     const el = document.createElement('textarea');
     el.value = text;
@@ -81,6 +139,7 @@ function copyToClipboard(text, label = 'nội dung') {
     document.execCommand('copy');
     document.body.removeChild(el);
     showToast(`Đã sao chép ${label}!`);
+    addLog('INFO', `Đã copy ${label} (fallback) vào clipboard`);
   });
 }
 
@@ -96,8 +155,9 @@ function setTab(tab) {
   jsonContainer.classList.toggle('hidden', tab !== 'json');
 }
 
-// Built-in JavaScript Offline Generator (Triple Safety Net)
+// Built-in JavaScript Offline Generator (Guaranteed safety net)
 function generateClientMockUsers(count, genderFilter, natCode) {
+  addLog('INFO', `Tạo ${count} profiles bằng Offline JS Engine (nat: ${natCode || 'US'})`);
   const isVn = (natCode || '').toLowerCase().includes('vn');
   const maleFirst = isVn
     ? ['Minh', 'Hoàng', 'Duy', 'Tuấn', 'Nam', 'Quân', 'Long', 'Đức', 'Anh', 'Hùng', 'Bảo', 'Huy', 'Thành', 'Phúc', 'Việt']
@@ -181,6 +241,8 @@ async function fetchUsers() {
   const nat = selectNat.value === 'all' ? null : selectNat.value;
   const mode = selectMode.value;
 
+  addLog('INFO', `▶ Bắt đầu tạo dữ liệu: count=${count}, gender=${gender || 'all'}, nat=${nat || 'all'}, mode=${mode}`);
+
   loadingState.classList.remove('hidden');
   cardsContainer.classList.add('hidden');
   tableContainer.classList.add('hidden');
@@ -193,14 +255,16 @@ async function fetchUsers() {
   const invoke = getTauriInvoke();
   if (invoke) {
     try {
+      addLog('INFO', 'Đang gọi lệnh fetch_users xuống Rust Core qua Tauri IPC...');
       data = await invoke('fetch_users', {
         count: count,
         gender: gender,
         nat: nat,
         mode: mode
       });
+      addLog('SUCCESS', `Rust Core trả về thành công ${data?.results?.length || 0} kết quả (source: ${data?.source})`);
     } catch (ipcErr) {
-      console.warn('Tauri IPC failed, switching to Tier 2 (Direct Web):', ipcErr);
+      addLog('WARN', `Tauri IPC gặp lỗi: ${ipcErr}. Chuyển sang Tier 2 (Direct HTTPS)...`);
     }
   }
 
@@ -215,6 +279,7 @@ async function fetchUsers() {
         if (gender) apiUrl += `&gender=${gender}`;
         if (nat && nat !== 'all') apiUrl += `&nat=${nat}`;
 
+        addLog('INFO', `Đang gọi trực tiếp API randomuser.me: ${apiUrl}`);
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 4000);
 
@@ -224,9 +289,12 @@ async function fetchUsers() {
         if (res.ok) {
           data = await res.json();
           data.source = 'randomuser.me (Direct)';
+          addLog('SUCCESS', `API trả về ${data.results.length} profiles qua HTTPS trực tiếp`);
+        } else {
+          addLog('WARN', `API trả về HTTP status: ${res.status}`);
         }
       } catch (netErr) {
-        console.warn('Direct web fetch failed, switching to Tier 3 (Offline):', netErr);
+        addLog('WARN', `Lỗi kết nối mạng: ${netErr.message}. Kích hoạt Tier 3 (Offline Emergency Engine)...`);
       }
     }
   }
@@ -255,6 +323,7 @@ async function fetchUsers() {
   renderData();
   loadingState.classList.add('hidden');
   setTab(currentTab);
+  addLog('SUCCESS', `Hoàn tất hiển thị ${currentUsers.length} profiles trong ${elapsed}ms.`);
 }
 
 // Render Data
@@ -463,6 +532,7 @@ async function exportCSV() {
 
   if (invoke) {
     try {
+      addLog('INFO', 'Mở hộp thoại Windows Save File As (CSV)...');
       const savedPath = await invoke('save_file_dialog', {
         defaultName: defaultName,
         content: csvContent,
@@ -470,10 +540,14 @@ async function exportCSV() {
       });
       if (savedPath) {
         showToast(`Đã lưu file thành công!`);
+        addLog('SUCCESS', `Đã lưu file CSV tại: ${savedPath}`);
+        return;
+      } else {
+        addLog('INFO', 'Người dùng đã hủy lưu file.');
         return;
       }
     } catch (err) {
-      console.warn('Tauri save dialog error, falling back to browser download:', err);
+      addLog('WARN', `Tauri save dialog gặp lỗi: ${err}. Dùng fallback browser download.`);
     }
   }
 
@@ -487,6 +561,7 @@ async function exportCSV() {
   a.click();
   a.remove();
   showToast('Đã tải xuống file CSV!');
+  addLog('SUCCESS', `Đã tải xuống file CSV: ${defaultName}`);
 }
 
 // Export to JSON
@@ -502,6 +577,7 @@ async function exportJSON() {
 
   if (invoke) {
     try {
+      addLog('INFO', 'Mở hộp thoại Windows Save File As (JSON)...');
       const savedPath = await invoke('save_file_dialog', {
         defaultName: defaultName,
         content: jsonContent,
@@ -509,10 +585,14 @@ async function exportJSON() {
       });
       if (savedPath) {
         showToast(`Đã lưu file thành công!`);
+        addLog('SUCCESS', `Đã lưu file JSON tại: ${savedPath}`);
+        return;
+      } else {
+        addLog('INFO', 'Người dùng đã hủy lưu file.');
         return;
       }
     } catch (err) {
-      console.warn('Tauri save dialog error, falling back to browser download:', err);
+      addLog('WARN', `Tauri save dialog gặp lỗi: ${err}. Dùng fallback browser download.`);
     }
   }
 
@@ -525,6 +605,7 @@ async function exportJSON() {
   a.click();
   a.remove();
   showToast('Đã tải xuống file JSON!');
+  addLog('SUCCESS', `Đã tải xuống file JSON: ${defaultName}`);
 }
 
 // Client-side quick filter
@@ -542,7 +623,10 @@ filterInput.addEventListener('input', (e) => {
 });
 
 // Event Listeners
-btnGenerate.addEventListener('click', fetchUsers);
+btnGenerate.addEventListener('click', () => {
+  addLog('INFO', "Click nút 'Tạo Dữ Liệu Mới'");
+  fetchUsers();
+});
 btnExportCSV.addEventListener('click', exportCSV);
 btnExportJSON.addEventListener('click', exportJSON);
 btnCopyJSON.addEventListener('click', () => {
@@ -563,11 +647,37 @@ document.querySelectorAll('.quick-count').forEach(btn => {
     });
     btn.classList.add('bg-blue-100', 'text-blue-700', 'font-bold');
     btn.classList.remove('bg-slate-100', 'text-slate-700');
+    addLog('INFO', `Chọn nhanh số lượng: ${btn.dataset.val}`);
     fetchUsers();
   });
 });
 
+// Debug Log Controls
+if (btnClearLog) {
+  btnClearLog.addEventListener('click', () => {
+    logContent.innerHTML = '';
+    logHistory = [];
+    logCount = 0;
+    logCounter.textContent = '0 sự kiện';
+    addLog('INFO', 'Đã xóa nhật ký');
+  });
+}
+
+if (btnCopyLog) {
+  btnCopyLog.addEventListener('click', () => {
+    copyToClipboard(logHistory.join('\n'), 'toàn bộ nhật ký');
+  });
+}
+
+if (btnToggleLog) {
+  btnToggleLog.addEventListener('click', () => {
+    logContent.classList.toggle('hidden');
+    btnToggleLog.textContent = logContent.classList.contains('hidden') ? 'Mở rộng' : 'Thu gọn';
+  });
+}
+
 // Initial Load
 window.addEventListener('DOMContentLoaded', () => {
+  addLog('INFO', 'DOM Content Loaded - Bắt đầu tải dữ liệu khởi tạo');
   fetchUsers();
 });

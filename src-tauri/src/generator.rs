@@ -149,3 +149,41 @@ pub fn generate_local_users(count: u32, gender_filter: Option<&str>, nat_filter:
         }
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_generate_default_count() {
+        let val = generate_local_users(10, None, None);
+        let list = val["results"].as_array().expect("results should be an array");
+        assert_eq!(list.len(), 10);
+    }
+
+    #[test]
+    fn test_generate_vietnamese_users() {
+        let val = generate_local_users(5, Some("male"), Some("VN"));
+        let list = val["results"].as_array().unwrap();
+        assert_eq!(list.len(), 5);
+        for u in list {
+            assert_eq!(u["gender"], "male");
+            assert_eq!(u["nat"], "VN");
+            assert_eq!(u["location"]["country"], "Vietnam");
+            assert!(u["email"].as_str().unwrap().contains("@example.com"));
+            assert!(!u["login"]["password"].as_str().unwrap().is_empty());
+        }
+    }
+
+    #[test]
+    fn test_generate_female_us() {
+        let val = generate_local_users(5, Some("female"), Some("US"));
+        let list = val["results"].as_array().unwrap();
+        assert_eq!(list.len(), 5);
+        for u in list {
+            assert_eq!(u["gender"], "female");
+            assert_eq!(u["nat"], "US");
+            assert_eq!(u["location"]["country"], "United States");
+        }
+    }
+}
