@@ -2,6 +2,38 @@ use rand::Rng;
 use serde_json::{json, Value};
 use uuid::Uuid;
 
+pub fn to_ascii_slug(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        let r = match c {
+            'a' | 'A' | 'à' | 'À' | 'á' | 'Á' | 'ả' | 'Ả' | 'ã' | 'Ã' | 'ạ' | 'Ạ'
+            | 'ă' | 'Ă' | 'ằ' | 'Ằ' | 'ắ' | 'Ắ' | 'ẳ' | 'Ẳ' | 'ẵ' | 'Ẵ' | 'ặ' | 'Ặ'
+            | 'â' | 'Â' | 'ầ' | 'Ầ' | 'ấ' | 'Ấ' | 'ẩ' | 'Ẩ' | 'ẫ' | 'Ẫ' | 'ậ' | 'Ậ' => 'a',
+            'd' | 'D' | 'đ' | 'Đ' => 'd',
+            'e' | 'E' | 'è' | 'È' | 'é' | 'É' | 'ẻ' | 'Ẻ' | 'ẽ' | 'Ẽ' | 'ẹ' | 'Ẹ'
+            | 'ê' | 'Ê' | 'ề' | 'Ề' | 'ế' | 'Ế' | 'ể' | 'Ể' | 'ễ' | 'Ễ' | 'ệ' | 'Ệ' => 'e',
+            'i' | 'I' | 'ì' | 'Ì' | 'í' | 'Í' | 'ỉ' | 'Ỉ' | 'ĩ' | 'Ĩ' | 'ị' | 'Ị' => 'i',
+            'o' | 'O' | 'ò' | 'Ò' | 'ó' | 'Ó' | 'ỏ' | 'Ỏ' | 'õ' | 'Õ' | 'ọ' | 'Ọ'
+            | 'ô' | 'Ô' | 'ồ' | 'Ồ' | 'ố' | 'Ố' | 'ổ' | 'Ổ' | 'ỗ' | 'Ỗ' | 'ộ' | 'Ộ'
+            | 'ơ' | 'Ơ' | 'ờ' | 'Ờ' | 'ớ' | 'Ớ' | 'ở' | 'Ở' | 'ỡ' | 'Ỡ' | 'ợ' | 'Ợ' => 'o',
+            'u' | 'U' | 'ù' | 'Ù' | 'ú' | 'Ú' | 'ủ' | 'Ủ' | 'ũ' | 'Ũ' | 'ụ' | 'Ụ'
+            | 'ư' | 'Ư' | 'ừ' | 'Ừ' | 'ứ' | 'Ứ' | 'ử' | 'Ử' | 'ữ' | 'Ữ' | 'ự' | 'Ự' => 'u',
+            'y' | 'Y' | 'ỳ' | 'Ỳ' | 'ý' | 'Ý' | 'ỷ' | 'Ỷ' | 'ỹ' | 'Ỹ' | 'ỵ' | 'Ỵ' => 'y',
+            other => {
+                if other.is_ascii_alphanumeric() {
+                    other.to_ascii_lowercase()
+                } else {
+                    '_'
+                }
+            }
+        };
+        if r != '_' || (!out.is_empty() && !out.ends_with('_')) {
+            out.push(r);
+        }
+    }
+    out.trim_matches('_').to_string()
+}
+
 pub fn generate_local_users(
     count: u32,
     gender_filter: Option<&str>,
@@ -147,14 +179,11 @@ pub fn generate_local_users(
         let birth_day = rng.gen_range(1..=28);
         let dob_str = format!("{:04}-{:02}-{:02}T08:00:00.000Z", birth_year, birth_month, birth_day);
 
-        let random_suffix = rng.gen_range(100..9999);
-        let username = format!(
-            "{}{}{}",
-            full_first_name.to_lowercase().replace(' ', "").chars().take(8).collect::<String>(),
-            last_name.to_lowercase().chars().take(4).collect::<String>(),
-            random_suffix
-        );
-        let email = format!("{}@tuquet.io", username);
+        let clean_first = to_ascii_slug(&full_first_name).replace('_', "");
+        let clean_last = to_ascii_slug(last_name).replace('_', "");
+        let random_suffix = rng.gen_range(10..999);
+        let username = format!("{}_{}{}", clean_last, clean_first, random_suffix);
+        let email = format!("{}.{}{}@tuquet.io", clean_first, clean_last, random_suffix);
         let password = format!("Pass_{:04}!", rng.gen_range(1000..9999));
 
         let phone_prefix = if is_vn {
@@ -167,23 +196,75 @@ pub fn generate_local_users(
 
         let user_uuid = Uuid::new_v4().to_string();
 
-        // Avatar Generation: Real Human Photo vs Vector SVG
+        let male_portraits_hd = [
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1480429370139-e0132c086e2a?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1534308143481-c55f00be8bd7?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1531891437562-4301cf0931ee?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1519764622345-23439dd774f7?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1562788869-4ed32648eb72?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=800&h=800&fit=crop&crop=faces&q=85"
+        ];
+
+        let female_portraits_hd = [
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1548142813-c348350df52b?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1558898479-33c0057a5d12?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1524250502761-1ac6f2e30d43?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1543610892-0b1f7e6d8ac1?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1514315384763-ba401779410f?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1509783236416-c9ad59bae472?w=800&h=800&fit=crop&crop=faces&q=85",
+            "https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=800&h=800&fit=crop&crop=faces&q=85"
+        ];
+
+        // Avatar Generation: High-Resolution (800x800) Real Human Photo vs Vector SVG
         let (avatar_large, avatar_medium, avatar_thumb) = if is_svg {
             let avatar_seed = format!("{}-{}", username, user_uuid);
             let url = format!(
-                "https://api.dicebear.com/7.x/avataaars/svg?seed={}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf",
+                "https://api.dicebear.com/7.x/avataaars/svg?size=800&seed={}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf",
                 avatar_seed
             );
             (url.clone(), url.clone(), url)
         } else {
-            // Real Human Portrait Photo (RandomUser Portraits men/women 0-99)
-            let photo_id = rng.gen_range(0..100);
-            let gender_dir = if is_male { "men" } else { "women" };
-            (
-                format!("https://randomuser.me/api/portraits/{}/{}.jpg", gender_dir, photo_id),
-                format!("https://randomuser.me/api/portraits/med/{}/{}.jpg", gender_dir, photo_id),
-                format!("https://randomuser.me/api/portraits/thumb/{}/{}.jpg", gender_dir, photo_id),
-            )
+            // High-Resolution 800x800 Real Human Portrait Photo
+            let photo_url = if rng.gen_bool(0.7) {
+                if is_male {
+                    let idx = rng.gen_range(0..male_portraits_hd.len());
+                    male_portraits_hd[idx].to_string()
+                } else {
+                    let idx = rng.gen_range(0..female_portraits_hd.len());
+                    female_portraits_hd[idx].to_string()
+                }
+            } else {
+                let img_id = rng.gen_range(1..=70);
+                format!("https://i.pravatar.cc/800?img={}", img_id)
+            };
+            (photo_url.clone(), photo_url.clone(), photo_url)
         };
 
         // Embedded Inline SVG Data URI (Works 100% offline, zero network requests, forever permanent)
@@ -288,7 +369,11 @@ mod tests {
         let list = data["results"].as_array().unwrap();
         assert_eq!(list.len(), 10);
         for u in list {
-            assert!(u["picture"]["large"].as_str().unwrap().contains("portraits"));
+            let email = u["email"].as_str().unwrap();
+            assert!(email.is_ascii(), "Email must be strictly ASCII: {}", email);
+            assert!(!email.contains(' '), "Email must not have spaces: {}", email);
+            let img = u["picture"]["large"].as_str().unwrap();
+            assert!(img.contains("unsplash.com") || img.contains("pravatar.cc") || img.contains("portraits"));
         }
     }
 
@@ -300,6 +385,7 @@ mod tests {
         for u in list {
             assert_eq!(u["gender"], "female");
             assert_eq!(u["nat"], "US");
+            assert!(u["email"].as_str().unwrap().is_ascii());
             assert!(u["picture"]["large"].as_str().unwrap().contains("dicebear.com"));
             assert!(u["picture"]["data_uri"].as_str().unwrap().starts_with("data:image/svg+xml"));
         }
@@ -315,7 +401,8 @@ mod tests {
             assert_eq!(u["nat"], "VN");
             assert!(u["job"].is_string());
             assert_eq!(u["id"]["name"], "CCCD");
-            assert!(u["picture"]["large"].as_str().unwrap().contains("portraits/men"));
+            let email = u["email"].as_str().unwrap();
+            assert!(email.is_ascii(), "Vietnamese email must be strictly ASCII: {}", email);
         }
     }
 }

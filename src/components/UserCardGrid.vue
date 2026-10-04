@@ -55,27 +55,27 @@ function getFullAddress(u: UserProfile): string {
     >
       <div class="p-5 space-y-3">
         <!-- Top: Avatar & Name -->
-        <div class="flex items-start space-x-3">
+        <div class="flex items-start space-x-3.5">
           <div class="relative shrink-0 group/avatar">
             <img
               :src="u.picture?.large || u.picture?.medium || 'https://randomuser.me/api/portraits/lego/1.jpg'"
               :alt="getFullName(u)"
-              class="w-14 h-14 rounded-2xl object-cover bg-slate-100 border border-slate-200 shadow-2xs"
+              class="w-18 h-18 rounded-2xl object-cover bg-slate-100 border border-slate-200 shadow-sm"
               loading="lazy"
             />
             <button
               @click.stop="emit('downloadAvatar', u)"
-              title="Tải avatar này về máy"
+              title="Download Avatar"
               class="absolute inset-0 bg-slate-900/60 text-white rounded-2xl opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-all cursor-pointer backdrop-blur-2xs"
             >
-              <Download class="w-5 h-5 drop-shadow" />
+              <Download class="w-6 h-6 drop-shadow" />
             </button>
             <span
               :class="[
-                'absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-bold text-white',
+                'absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold text-white',
                 u.gender === 'female' ? 'bg-pink-500' : 'bg-blue-500'
               ]"
-              :title="u.gender === 'female' ? 'Nữ' : 'Nam'"
+              :title="u.gender === 'female' ? 'Female' : 'Male'"
             >
               {{ u.gender === 'female' ? '♀' : '♂' }}
             </span>
@@ -118,7 +118,7 @@ function getFullAddress(u: UserProfile): string {
 
           <!-- Phone -->
           <div
-            @click="handleCopy(u.phone, `phone-${idx}`, 'Số điện thoại')"
+            @click="handleCopy(u.phone, `phone-${idx}`, 'Phone Number')"
             class="p-2 rounded-xl bg-slate-50 hover:bg-sky-50/80 border border-slate-100 hover:border-sky-200 transition-all flex items-center justify-between cursor-pointer group"
           >
             <div class="flex items-center gap-2 truncate">
@@ -131,7 +131,7 @@ function getFullAddress(u: UserProfile): string {
 
           <!-- Address -->
           <div
-            @click="handleCopy(getFullAddress(u), `addr-${idx}`, 'Địa chỉ')"
+            @click="handleCopy(getFullAddress(u), `addr-${idx}`, 'Address')"
             class="p-2 rounded-xl bg-slate-50 hover:bg-sky-50/80 border border-slate-100 hover:border-sky-200 transition-all flex items-center justify-between cursor-pointer group"
           >
             <div class="flex items-center gap-2 truncate">
@@ -156,9 +156,9 @@ function getFullAddress(u: UserProfile): string {
             </div>
           </div>
           <button
-            @click="handleCopy(u.login?.password || '', `pass-${idx}`, 'Mật khẩu')"
-            title="Copy Mật Khẩu"
-            class="p-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition shadow-2xs shrink-0"
+            @click="handleCopy(u.login?.password || '', `pass-${idx}`, 'Password')"
+            title="Copy Password"
+            class="p-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition shadow-2xs shrink-0 cursor-pointer"
           >
             <Check v-if="copiedKey === `pass-${idx}`" class="w-3.5 h-3.5 text-emerald-600" />
             <Key v-else class="w-3.5 h-3.5" />
@@ -168,7 +168,7 @@ function getFullAddress(u: UserProfile): string {
 
       <!-- Footer: Copy raw JSON -->
       <div class="px-5 py-2.5 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-        <span>Tuổi: <strong class="text-slate-700">{{ u.dob?.age || '25' }}</strong></span>
+        <span>Age: <strong class="text-slate-700">{{ u.dob?.age || '25' }}</strong></span>
         <button
           @click="handleCopy(JSON.stringify(u, null, 2), `json-${idx}`, 'JSON Profile')"
           class="flex items-center gap-1 text-slate-500 hover:text-sky-600 font-semibold transition cursor-pointer"

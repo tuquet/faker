@@ -37,7 +37,7 @@ const emit = defineEmits<{
             </Badge>
           </div>
           <p class="text-xs text-slate-500">
-            Tauri v2 + Vue 3 • {{ totalCount }} profile hiện tại
+            Tauri v2 + Vue 3 • {{ totalCount }} active profiles
           </p>
         </div>
       </div>
@@ -47,7 +47,7 @@ const emit = defineEmits<{
         <!-- Status indicator -->
         <Badge v-if="isGenerating" variant="outline" class="gap-1.5 py-1 bg-amber-50 text-amber-700 border-amber-200">
           <Loader2 class="w-3.5 h-3.5 animate-spin" />
-          <span>Đang sinh dữ liệu...</span>
+          <span>Generating data...</span>
         </Badge>
         <Badge v-else variant="outline" class="gap-1.5 py-1 bg-emerald-50 text-emerald-700 border-emerald-200">
           <Zap class="w-3.5 h-3.5 text-emerald-600" />
@@ -64,7 +64,7 @@ const emit = defineEmits<{
                 ? 'bg-white text-sky-700 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             ]"
-            title="Chế độ Thẻ (Cards)"
+            title="Cards View"
           >
             <LayoutGrid class="w-3.5 h-3.5" />
             <span class="hidden sm:inline">Cards</span>
@@ -77,7 +77,7 @@ const emit = defineEmits<{
                 ? 'bg-white text-sky-700 shadow-xs'
                 : 'text-slate-600 hover:text-slate-900'
             ]"
-            title="Chế độ Bảng (Data Table)"
+            title="Data Table View"
           >
             <TableProperties class="w-3.5 h-3.5" />
             <span class="hidden sm:inline">Data Table</span>

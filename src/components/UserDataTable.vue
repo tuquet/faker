@@ -115,21 +115,21 @@ const paginatedUsers = computed(() => {
         <Search class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
         <Input
           v-model="searchQuery"
-          placeholder="Lọc họ tên, email, SĐT, username..."
+          placeholder="Filter name, email, phone, username..."
           class="pl-9 h-9 text-xs"
         />
       </div>
 
       <div class="flex items-center gap-3 text-xs text-slate-500 font-medium">
-        <span>Hiển thị <strong>{{ paginatedUsers.length }}</strong> / <strong>{{ filteredUsers.length }}</strong> dòng</span>
+        <span>Showing <strong>{{ paginatedUsers.length }}</strong> / <strong>{{ filteredUsers.length }}</strong> rows</span>
         <select
           v-model="pageSize"
-          class="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          class="h-8 rounded-lg border border-slate-200 bg-white px-2 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-1 focus:ring-sky-500 cursor-pointer"
         >
-          <option :value="10">10 dòng/trang</option>
-          <option :value="15">15 dòng/trang</option>
-          <option :value="25">25 dòng/trang</option>
-          <option :value="50">50 dòng/trang</option>
+          <option :value="10">10 rows/page</option>
+          <option :value="15">15 rows/page</option>
+          <option :value="25">25 rows/page</option>
+          <option :value="50">50 rows/page</option>
         </select>
       </div>
     </div>
@@ -143,19 +143,19 @@ const paginatedUsers = computed(() => {
             <th class="py-3 px-4">Avatar</th>
             <th class="py-3 px-4 cursor-pointer select-none hover:text-slate-900" @click="toggleSort('name')">
               <div class="flex items-center gap-1.5">
-                <span>Họ Tên</span>
+                <span>Full Name</span>
                 <ArrowUpDown class="w-3 h-3 text-slate-400" />
               </div>
             </th>
             <th class="py-3 px-4 cursor-pointer select-none hover:text-slate-900" @click="toggleSort('gender')">
               <div class="flex items-center gap-1.5">
-                <span>Giới Tính</span>
+                <span>Gender</span>
                 <ArrowUpDown class="w-3 h-3 text-slate-400" />
               </div>
             </th>
             <th class="py-3 px-4 cursor-pointer select-none hover:text-slate-900" @click="toggleSort('nat')">
               <div class="flex items-center gap-1.5">
-                <span>Quốc Tịch</span>
+                <span>Nationality</span>
                 <ArrowUpDown class="w-3 h-3 text-slate-400" />
               </div>
             </th>
@@ -165,9 +165,9 @@ const paginatedUsers = computed(() => {
                 <ArrowUpDown class="w-3 h-3 text-slate-400" />
               </div>
             </th>
-            <th class="py-3 px-4">Số Điện Thoại</th>
-            <th class="py-3 px-4">Địa Chỉ / Khu Vực</th>
-            <th class="py-3 px-4">Tài Khoản / Mật Khẩu</th>
+            <th class="py-3 px-4">Phone Number</th>
+            <th class="py-3 px-4">Location / Address</th>
+            <th class="py-3 px-4">Username / Password</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100">
@@ -238,9 +238,9 @@ const paginatedUsers = computed(() => {
                 <span class="text-slate-800 font-semibold">{{ u.login?.username || 'user' }}</span>
                 <span class="text-slate-300">/</span>
                 <button
-                  @click="handleCopy(u.login?.password || '', `tbl-pass-${idx}`, 'Mật khẩu')"
+                  @click="handleCopy(u.login?.password || '', `tbl-pass-${idx}`, 'Password')"
                   class="flex items-center gap-1 text-emerald-700 font-bold hover:underline cursor-pointer"
-                  title="Bấm để copy mật khẩu"
+                  title="Click to copy password"
                 >
                   <span>{{ u.login?.password || 'Pass@123' }}</span>
                   <Check v-if="copiedKey === `tbl-pass-${idx}`" class="w-3 h-3 text-emerald-600" />
@@ -252,7 +252,7 @@ const paginatedUsers = computed(() => {
 
           <tr v-if="filteredUsers.length === 0">
             <td colspan="9" class="py-8 text-center text-slate-400">
-              Không tìm thấy người dùng nào phù hợp với bộ lọc.
+              No profiles found matching your search.
             </td>
           </tr>
         </tbody>
@@ -262,7 +262,7 @@ const paginatedUsers = computed(() => {
     <!-- Table Pagination -->
     <div class="p-3 border-t border-slate-200 bg-slate-50/50 flex items-center justify-between text-xs text-slate-600">
       <div>
-        Trang <strong>{{ currentPage }}</strong> / <strong>{{ totalPages }}</strong>
+        Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong>
       </div>
       <div class="flex items-center gap-2">
         <Button
@@ -270,19 +270,19 @@ const paginatedUsers = computed(() => {
           size="sm"
           :disabled="currentPage <= 1"
           @click="currentPage--"
-          class="h-8 px-2 gap-1 text-xs"
+          class="h-8 px-2 gap-1 text-xs cursor-pointer"
         >
           <ChevronLeft class="w-3.5 h-3.5" />
-          Trước
+          Previous
         </Button>
         <Button
           variant="outline"
           size="sm"
           :disabled="currentPage >= totalPages"
           @click="currentPage++"
-          class="h-8 px-2 gap-1 text-xs"
+          class="h-8 px-2 gap-1 text-xs cursor-pointer"
         >
-          Sau
+          Next
           <ChevronRight class="w-3.5 h-3.5" />
         </Button>
       </div>

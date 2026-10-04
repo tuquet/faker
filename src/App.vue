@@ -59,11 +59,11 @@ async function handleGenerate() {
     isFallback.value = Boolean(res.offlineFallback);
     sourceText.value = res.source || (mode.value === 'api' ? 'RandomUser API' : 'Offline Core (0ms)');
 
-    showToast(`Đã sinh ${users.value.length} profile thành công!`);
-    logClientMessage('INFO', `Sinh thành công ${users.value.length} profile (${avatarStyle.value}).`);
+    showToast(`Successfully generated ${users.value.length} profiles!`);
+    logClientMessage('INFO', `Generated ${users.value.length} profiles (${avatarStyle.value}).`);
   } catch (err: any) {
-    showToast(`Lỗi: ${err.message}`);
-    logClientMessage('ERROR', `Lỗi khi sinh profile: ${err.message}`);
+    showToast(`Error: ${err.message}`);
+    logClientMessage('ERROR', `Error generating profiles: ${err.message}`);
   } finally {
     isLoading.value = false;
   }
@@ -76,11 +76,11 @@ async function handleDownloadAvatar(user: UserProfile) {
   try {
     const res = await downloadSingleAvatar(url, user.login?.username || 'avatar');
     if (res) {
-      showToast(`Đã tải avatar của ${user.name.first} về máy!`);
-      logClientMessage('SUCCESS', `Đã tải avatar: ${user.login?.username}`);
+      showToast(`Downloaded avatar for ${user.name.first}!`);
+      logClientMessage('SUCCESS', `Downloaded avatar: ${user.login?.username}`);
     }
   } catch (err: any) {
-    showToast(`Lỗi khi tải avatar: ${err.message}`);
+    showToast(`Error downloading avatar: ${err.message}`);
   }
 }
 
@@ -94,15 +94,15 @@ async function handleExportCsv() {
     try {
       const savedPath = await saveFileDialog(filename, csvContent, 'csv');
       if (savedPath) {
-        showToast('Đã lưu file CSV thành công!');
-        logClientMessage('SUCCESS', `Lưu CSV tại ${savedPath}`);
+        showToast('CSV file exported successfully!');
+        logClientMessage('SUCCESS', `Saved CSV at ${savedPath}`);
       }
     } catch (err: any) {
-      showToast(`Lỗi khi lưu file CSV: ${err.message}`);
+      showToast(`Error saving CSV: ${err.message}`);
     }
   } else {
     downloadBrowserFile(csvContent, filename, 'text/csv;charset=utf-8;');
-    showToast('Đã tải xuống file CSV!');
+    showToast('CSV file downloaded!');
   }
 }
 
@@ -116,19 +116,19 @@ async function handleExportJson() {
     try {
       const savedPath = await saveFileDialog(filename, jsonContent, 'json');
       if (savedPath) {
-        showToast('Đã lưu file JSON thành công!');
-        logClientMessage('SUCCESS', `Lưu JSON tại ${savedPath}`);
+        showToast('JSON file exported successfully!');
+        logClientMessage('SUCCESS', `Saved JSON at ${savedPath}`);
       }
     } catch (err: any) {
-      showToast(`Lỗi khi lưu file JSON: ${err.message}`);
+      showToast(`Error saving JSON: ${err.message}`);
     }
   } else {
     downloadBrowserFile(jsonContent, filename, 'application/json');
-    showToast('Đã tải xuống file JSON!');
+    showToast('JSON file downloaded!');
   }
 }
 
-// Export Complete Asset Bundle (CSV + JSON + Local JPG/SVG Avatars)
+// Export Complete Asset Bundle (CSV + JSON + Local HD Avatars)
 async function handleExportBundle() {
   if (users.value.length === 0) return;
 
@@ -136,23 +136,23 @@ async function handleExportBundle() {
     try {
       const savedFolder = await exportBundleDialog(users.value);
       if (savedFolder) {
-        showToast('Đã xuất trọn gói dữ liệu & thư mục avatar về máy!');
-        logClientMessage('SUCCESS', `Xuất Bundle thành công tại ${savedFolder}`);
+        showToast('Full bundle exported with HD avatars folder!');
+        logClientMessage('SUCCESS', `Exported bundle at ${savedFolder}`);
       }
     } catch (err: any) {
-      showToast(`Lỗi xuất gói: ${err.message}`);
-      logClientMessage('ERROR', `Lỗi xuất gói: ${err.message}`);
+      showToast(`Export error: ${err.message}`);
+      logClientMessage('ERROR', `Export error: ${err.message}`);
     }
   } else {
     // Browser fallback: download both CSV and JSON
     handleExportCsv();
     setTimeout(() => handleExportJson(), 500);
-    showToast('Đang tải dữ liệu CSV & JSON qua trình duyệt...');
+    showToast('Downloading CSV & JSON via browser...');
   }
 }
 
 function onCopied(field: string) {
-  showToast(`Đã chép ${field} vào Clipboard!`);
+  showToast(`Copied ${field} to clipboard!`);
 }
 
 onMounted(() => {
@@ -220,9 +220,9 @@ onMounted(() => {
             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
           </svg>
         </div>
-        <h3 class="font-bold text-slate-800 text-sm">Chưa có profile nào</h3>
+        <h3 class="font-bold text-slate-800 text-sm">No profiles generated yet</h3>
         <p class="text-xs text-slate-500 max-w-sm mx-auto">
-          Nhấn nút "Sinh Profile Mới" ở trên để tạo dữ liệu ngẫu nhiên với động cơ offline siêu tốc.
+          Click "Generate Profiles" above to generate realistic personas with HD photos or vector avatars.
         </p>
       </div>
     </main>

@@ -159,7 +159,7 @@ const natOptions = [
           class="gap-2 shadow-md shadow-sky-600/20 cursor-pointer"
         >
           <Sparkles class="w-4 h-4" />
-          <span>{{ isLoading ? 'Đang Xử Lý...' : 'Sinh Profile Mới' }}</span>
+          <span>{{ isLoading ? 'Generating...' : 'Generate Profiles' }}</span>
         </Button>
       </div>
 
@@ -172,7 +172,7 @@ const natOptions = [
           class="gap-1.5 font-medium cursor-pointer"
         >
           <FileSpreadsheet class="w-4 h-4 text-emerald-600" />
-          <span>Xuất CSV</span>
+          <span>Export CSV</span>
         </Button>
         <Button
           variant="outline"
@@ -182,7 +182,7 @@ const natOptions = [
           class="gap-1.5 font-medium cursor-pointer"
         >
           <FileCode class="w-4 h-4 text-sky-600" />
-          <span>Xuất JSON</span>
+          <span>Export JSON</span>
         </Button>
         <Button
           variant="default"
@@ -190,10 +190,10 @@ const natOptions = [
           :disabled="totalLoaded === 0 || isLoading"
           @click="emit('exportBundle')"
           class="gap-1.5 font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs cursor-pointer"
-          title="Xuất trọn gói: CSV, JSON và toàn bộ file ảnh avatar (JPG/SVG) về máy"
+          title="Export complete bundle: CSV, JSON, and HD avatars folder"
         >
           <FolderArchive class="w-4 h-4 text-white" />
-          <span>Xuất Gói Hoàn Chỉnh (Bundle)</span>
+          <span>Export Full Bundle</span>
         </Button>
       </div>
     </div>
