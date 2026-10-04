@@ -1,0 +1,25 @@
+{
+  "name": "random-user-generator-app",
+  "version": "1.0.0",
+  "description": "Local Web App & API to generate random mock user profiles with online API & offline fallback",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "randomuser",
+    "mock-data",
+    "user-generator",
+    "faker",
+    "offline-tool"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@faker-js/faker": "^9.5.0",
+    "axios": "^1.7.9",
+    "cors": "^2.8.5",
+    "express": "^4.21.2"
+  }
+}
