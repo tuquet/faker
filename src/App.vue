@@ -8,6 +8,7 @@ import type { UserProfile } from './types/user';
 import {
   fetchUsersApi,
   saveFileDialog,
+  downloadSingleAvatar,
   exportBundleDialog,
   logClientMessage,
   isTauri
@@ -18,7 +19,9 @@ import { generateCSV, downloadBrowserFile } from './lib/utils';
 const users = ref<UserProfile[]>([]);
 const count = ref(10);
 const gender = ref('all');
-const nat = ref('all');
+const nat = ref('vn');
+const avatarStyle = ref<'real' | 'svg'>('real');
+const mode = ref<'local' | 'api'>('local');
 const viewMode = ref<'cards' | 'table'>('cards');
 const isLoading = ref(false);
 const isFallback = ref(false);
@@ -48,19 +51,36 @@ async function handleGenerate() {
       count: count.value,
       gender: gender.value === 'all' ? undefined : gender.value,
       nat: nat.value === 'all' ? undefined : nat.value,
+      mode: mode.value,
+      avatarStyle: avatarStyle.value,
     });
 
     users.value = res.results || [];
     isFallback.value = Boolean(res.offlineFallback);
-    sourceText.value = res.source || 'Offline Core (0ms)';
+    sourceText.value = res.source || (mode.value === 'api' ? 'RandomUser API' : 'Offline Core (0ms)');
 
     showToast(`Đã sinh ${users.value.length} profile thành công!`);
-    logClientMessage('INFO', `Sinh thành công ${users.value.length} profile.`);
+    logClientMessage('INFO', `Sinh thành công ${users.value.length} profile (${avatarStyle.value}).`);
   } catch (err: any) {
     showToast(`Lỗi: ${err.message}`);
     logClientMessage('ERROR', `Lỗi khi sinh profile: ${err.message}`);
   } finally {
     isLoading.value = false;
+  }
+}
+
+// Download single avatar
+async function handleDownloadAvatar(user: UserProfile) {
+  const url = user.picture?.large || user.picture?.medium;
+  if (!url) return;
+  try {
+    const res = await downloadSingleAvatar(url, user.login?.username || 'avatar');
+    if (res) {
+      showToast(`Đã tải avatar của ${user.name.first} về máy!`);
+      logClientMessage('SUCCESS', `Đã tải avatar: ${user.login?.username}`);
+    }
+  } catch (err: any) {
+    showToast(`Lỗi khi tải avatar: ${err.message}`);
   }
 }
 
@@ -108,7 +128,7 @@ async function handleExportJson() {
   }
 }
 
-// Export Complete Asset Bundle (CSV + JSON + Local SVG Avatars)
+// Export Complete Asset Bundle (CSV + JSON + Local JPG/SVG Avatars)
 async function handleExportBundle() {
   if (users.value.length === 0) return;
 
@@ -116,7 +136,7 @@ async function handleExportBundle() {
     try {
       const savedFolder = await exportBundleDialog(users.value);
       if (savedFolder) {
-        showToast('Đã xuất trọn gói dữ liệu & avatar SVG vào thư mục!');
+        showToast('Đã xuất trọn gói dữ liệu & thư mục avatar về máy!');
         logClientMessage('SUCCESS', `Xuất Bundle thành công tại ${savedFolder}`);
       }
     } catch (err: any) {
@@ -162,6 +182,10 @@ onMounted(() => {
         @update:gender="(v) => (gender = v)"
         :nat="nat"
         @update:nat="(v) => (nat = v)"
+        :avatar-style="avatarStyle"
+        @update:avatar-style="(v) => { avatarStyle = v; handleGenerate(); }"
+        :mode="mode"
+        @update:mode="(v) => { mode = v; handleGenerate(); }"
         :is-loading="isLoading"
         :total-loaded="users.length"
         @generate="handleGenerate"
@@ -176,11 +200,13 @@ onMounted(() => {
           v-if="viewMode === 'cards'"
           :users="users"
           @copied="onCopied"
+          @download-avatar="handleDownloadAvatar"
         />
         <UserDataTable
           v-else
           :users="users"
           @copied="onCopied"
+          @download-avatar="handleDownloadAvatar"
         />
       </div>
 

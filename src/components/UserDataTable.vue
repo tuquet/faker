@@ -14,6 +14,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   (e: 'copied', field: string): void;
+  (e: 'downloadAvatar', user: UserProfile): void;
 }>();
 
 const searchQuery = ref('');
@@ -180,9 +181,11 @@ const paginatedUsers = computed(() => {
             </td>
             <td class="py-2.5 px-4">
               <img
-                :src="u.picture?.thumbnail || u.picture?.medium || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + idx"
-                class="w-8 h-8 rounded-lg object-cover bg-slate-100 border border-slate-200"
+                :src="u.picture?.thumbnail || u.picture?.medium || 'https://randomuser.me/api/portraits/lego/1.jpg'"
+                class="w-8 h-8 rounded-lg object-cover bg-slate-100 border border-slate-200 cursor-pointer hover:ring-2 hover:ring-sky-400 transition"
                 loading="lazy"
+                title="Bấm để tải ảnh avatar này"
+                @click="emit('downloadAvatar', u)"
               />
             </td>
             <td class="py-2.5 px-4 font-semibold text-slate-900 whitespace-nowrap">

@@ -53,7 +53,8 @@ export interface FetchUsersParams {
   count: number;
   gender?: string;
   nat?: string;
-  mode?: 'auto' | 'api' | 'local';
+  mode?: 'local' | 'api' | 'auto';
+  avatarStyle?: 'real' | 'svg';
 }
 
 export interface FetchUsersResponse {

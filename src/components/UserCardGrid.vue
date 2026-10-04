@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Mail, Phone, MapPin, Copy, Check, Key, Code2, User } from 'lucide-vue-next';
+import { Mail, Phone, MapPin, Copy, Check, Key, Code2, Download } from 'lucide-vue-next';
 import { Card, Badge } from '@tuquet/vue-ui';
 import type { UserProfile } from '../types/user';
 import { copyToClipboard } from '../lib/utils';
@@ -13,6 +13,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   (e: 'copied', field: string): void;
+  (e: 'downloadAvatar', user: UserProfile): void;
 }>();
 
 const copiedKey = ref<string | null>(null);
@@ -55,13 +56,20 @@ function getFullAddress(u: UserProfile): string {
       <div class="p-5 space-y-3">
         <!-- Top: Avatar & Name -->
         <div class="flex items-start space-x-3">
-          <div class="relative shrink-0">
+          <div class="relative shrink-0 group/avatar">
             <img
-              :src="u.picture?.large || u.picture?.medium || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + idx"
+              :src="u.picture?.large || u.picture?.medium || 'https://randomuser.me/api/portraits/lego/1.jpg'"
               :alt="getFullName(u)"
               class="w-14 h-14 rounded-2xl object-cover bg-slate-100 border border-slate-200 shadow-2xs"
               loading="lazy"
             />
+            <button
+              @click.stop="emit('downloadAvatar', u)"
+              title="Tải avatar này về máy"
+              class="absolute inset-0 bg-slate-900/60 text-white rounded-2xl opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-all cursor-pointer backdrop-blur-2xs"
+            >
+              <Download class="w-5 h-5 drop-shadow" />
+            </button>
             <span
               :class="[
                 'absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-bold text-white',

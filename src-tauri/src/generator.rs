@@ -2,10 +2,16 @@ use rand::Rng;
 use serde_json::{json, Value};
 use uuid::Uuid;
 
-pub fn generate_local_users(count: u32, gender_filter: Option<&str>, nat_filter: Option<&str>) -> Value {
+pub fn generate_local_users(
+    count: u32,
+    gender_filter: Option<&str>,
+    nat_filter: Option<&str>,
+    avatar_style: Option<&str>,
+) -> Value {
     let mut rng = rand::thread_rng();
     let nat = nat_filter.unwrap_or("VN").to_uppercase();
     let is_vn = nat.contains("VN") || nat == "ALL";
+    let is_svg = avatar_style == Some("svg");
 
     let last_names_vn = [
         "Nguyễn", "Trần", "Lê", "Phạm", "Hoàng", "Huỳnh", "Phan", "Vũ", "Võ", "Đặng",
@@ -161,14 +167,26 @@ pub fn generate_local_users(count: u32, gender_filter: Option<&str>, nat_filter:
 
         let user_uuid = Uuid::new_v4().to_string();
 
-        // 1. Deterministic SVG Avatar URL with seed = uuid (Immunity to image change)
-        let avatar_seed = format!("{}-{}", username, user_uuid);
-        let avatar_svg_url = format!(
-            "https://api.dicebear.com/7.x/avataaars/svg?seed={}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf",
-            avatar_seed
-        );
+        // Avatar Generation: Real Human Photo vs Vector SVG
+        let (avatar_large, avatar_medium, avatar_thumb) = if is_svg {
+            let avatar_seed = format!("{}-{}", username, user_uuid);
+            let url = format!(
+                "https://api.dicebear.com/7.x/avataaars/svg?seed={}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf",
+                avatar_seed
+            );
+            (url.clone(), url.clone(), url)
+        } else {
+            // Real Human Portrait Photo (RandomUser Portraits men/women 0-99)
+            let photo_id = rng.gen_range(0..100);
+            let gender_dir = if is_male { "men" } else { "women" };
+            (
+                format!("https://randomuser.me/api/portraits/{}/{}.jpg", gender_dir, photo_id),
+                format!("https://randomuser.me/api/portraits/med/{}/{}.jpg", gender_dir, photo_id),
+                format!("https://randomuser.me/api/portraits/thumb/{}/{}.jpg", gender_dir, photo_id),
+            )
+        };
 
-        // 2. Embedded Inline SVG Data URI (Works 100% offline, zero network requests, forever permanent)
+        // Embedded Inline SVG Data URI (Works 100% offline, zero network requests, forever permanent)
         let initials = format!(
             "{}{}",
             last_name.chars().next().unwrap_or('T'),
@@ -238,9 +256,9 @@ pub fn generate_local_users(count: u32, gender_filter: Option<&str>, nat_filter:
                 "value": format!("{:012}", rng.gen_range(100000000000_u64..999999999999_u64))
             },
             "picture": {
-                "large": avatar_svg_url,
-                "medium": avatar_svg_url,
-                "thumbnail": avatar_svg_url,
+                "large": avatar_large,
+                "medium": avatar_medium,
+                "thumbnail": avatar_thumb,
                 "data_uri": inline_svg_data_uri
             },
             "nat": if is_vn { "VN" } else { "US" }
@@ -266,14 +284,17 @@ mod tests {
 
     #[test]
     fn test_generate_default_count() {
-        let data = generate_local_users(10, None, None);
+        let data = generate_local_users(10, None, None, None);
         let list = data["results"].as_array().unwrap();
         assert_eq!(list.len(), 10);
+        for u in list {
+            assert!(u["picture"]["large"].as_str().unwrap().contains("portraits"));
+        }
     }
 
     #[test]
     fn test_generate_female_us() {
-        let data = generate_local_users(5, Some("female"), Some("US"));
+        let data = generate_local_users(5, Some("female"), Some("US"), Some("svg"));
         let list = data["results"].as_array().unwrap();
         assert_eq!(list.len(), 5);
         for u in list {
@@ -286,7 +307,7 @@ mod tests {
 
     #[test]
     fn test_generate_vietnamese_users() {
-        let data = generate_local_users(10, Some("male"), Some("VN"));
+        let data = generate_local_users(10, Some("male"), Some("VN"), Some("real"));
         let list = data["results"].as_array().unwrap();
         assert_eq!(list.len(), 10);
         for u in list {
@@ -294,6 +315,7 @@ mod tests {
             assert_eq!(u["nat"], "VN");
             assert!(u["job"].is_string());
             assert_eq!(u["id"]["name"], "CCCD");
+            assert!(u["picture"]["large"].as_str().unwrap().contains("portraits/men"));
         }
     }
 }

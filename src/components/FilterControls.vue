@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { Sparkles, FileSpreadsheet, FileCode, FolderArchive, Users, Globe, UserCheck } from 'lucide-vue-next';
+import { Sparkles, FileSpreadsheet, FileCode, FolderArchive, Users, Globe, UserCheck, Image as ImageIcon, Cpu } from 'lucide-vue-next';
 import { Button, Input } from '@tuquet/vue-ui';
 
 interface Props {
   count: number;
   gender: string;
   nat: string;
+  avatarStyle: 'real' | 'svg';
+  mode: 'local' | 'api';
   isLoading: boolean;
   totalLoaded: number;
 }
@@ -16,6 +18,8 @@ const emit = defineEmits<{
   (e: 'update:count', val: number): void;
   (e: 'update:gender', val: string): void;
   (e: 'update:nat', val: string): void;
+  (e: 'update:avatarStyle', val: 'real' | 'svg'): void;
+  (e: 'update:mode', val: 'local' | 'api'): void;
   (e: 'generate'): void;
   (e: 'exportCsv'): void;
   (e: 'exportJson'): void;
@@ -39,7 +43,7 @@ const natOptions = [
 
 <template>
   <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-xs space-y-4">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
       <!-- 1. Count -->
       <div>
         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
@@ -62,7 +66,7 @@ const natOptions = [
             type="button"
             @click="emit('update:count', qc)"
             :class="[
-              'px-2 py-0.5 text-xs font-semibold rounded-md transition-all',
+              'px-2 py-0.5 text-xs font-semibold rounded-md transition-all cursor-pointer',
               count === qc
                 ? 'bg-sky-600 text-white shadow-2xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -82,31 +86,65 @@ const natOptions = [
         <select
           :value="gender"
           @change="(e) => emit('update:gender', (e.target as HTMLSelectElement).value)"
-          class="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+          class="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
         >
           <option value="all">Tất cả (Ngẫu nhiên)</option>
           <option value="male">Nam (Male)</option>
           <option value="female">Nữ (Female)</option>
         </select>
-        <p class="text-[11px] text-slate-400 mt-2">Chọn giới tính của profile cần sinh.</p>
+        <p class="text-[11px] text-slate-400 mt-2">Lọc giới tính theo hồ sơ.</p>
       </div>
 
       <!-- 3. Nationality -->
       <div>
         <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
           <Globe class="w-3.5 h-3.5 text-sky-600" />
-          Quốc Tịch (Nationality)
+          Quốc Tịch
         </label>
         <select
           :value="nat"
           @change="(e) => emit('update:nat', (e.target as HTMLSelectElement).value)"
-          class="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+          class="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
         >
           <option v-for="opt in natOptions" :key="opt.value" :value="opt.value">
             {{ opt.label }}
           </option>
         </select>
-        <p class="text-[11px] text-slate-400 mt-2">Việt Nam ưu tiên từ điển họ tên, nghề nghiệp & CCCD.</p>
+        <p class="text-[11px] text-slate-400 mt-2">Việt Nam ưu tiên từ điển CCCD & SĐT.</p>
+      </div>
+
+      <!-- 4. Avatar Style -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+          <ImageIcon class="w-3.5 h-3.5 text-sky-600" />
+          Kiểu Avatar
+        </label>
+        <select
+          :value="avatarStyle"
+          @change="(e) => emit('update:avatarStyle', (e.target as HTMLSelectElement).value as any)"
+          class="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+        >
+          <option value="real">🧑‍💼 Ảnh người thật (Portraits)</option>
+          <option value="svg">🎨 Vector SVG (Minh họa)</option>
+        </select>
+        <p class="text-[11px] text-slate-400 mt-2">Chân dung người thật hoặc vector.</p>
+      </div>
+
+      <!-- 5. Engine Mode -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+          <Cpu class="w-3.5 h-3.5 text-sky-600" />
+          Nguồn Dữ Liệu
+        </label>
+        <select
+          :value="mode"
+          @change="(e) => emit('update:mode', (e.target as HTMLSelectElement).value as any)"
+          class="flex h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+        >
+          <option value="local">⚡ Offline Core (Rust 0ms)</option>
+          <option value="api">🌐 RandomUser API (Web)</option>
+        </select>
+        <p class="text-[11px] text-slate-400 mt-2">Chạy offline 0ms hoặc API web.</p>
       </div>
     </div>
 
@@ -118,7 +156,7 @@ const natOptions = [
           size="default"
           :disabled="isLoading"
           @click="emit('generate')"
-          class="gap-2 shadow-md shadow-sky-600/20"
+          class="gap-2 shadow-md shadow-sky-600/20 cursor-pointer"
         >
           <Sparkles class="w-4 h-4" />
           <span>{{ isLoading ? 'Đang Xử Lý...' : 'Sinh Profile Mới' }}</span>
@@ -131,7 +169,7 @@ const natOptions = [
           size="sm"
           :disabled="totalLoaded === 0 || isLoading"
           @click="emit('exportCsv')"
-          class="gap-1.5 font-medium"
+          class="gap-1.5 font-medium cursor-pointer"
         >
           <FileSpreadsheet class="w-4 h-4 text-emerald-600" />
           <span>Xuất CSV</span>
@@ -141,7 +179,7 @@ const natOptions = [
           size="sm"
           :disabled="totalLoaded === 0 || isLoading"
           @click="emit('exportJson')"
-          class="gap-1.5 font-medium"
+          class="gap-1.5 font-medium cursor-pointer"
         >
           <FileCode class="w-4 h-4 text-sky-600" />
           <span>Xuất JSON</span>
@@ -151,8 +189,8 @@ const natOptions = [
           size="sm"
           :disabled="totalLoaded === 0 || isLoading"
           @click="emit('exportBundle')"
-          class="gap-1.5 font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs"
-          title="Xuất trọn gói: CSV, JSON và toàn bộ file ảnh avatar SVG offline về máy"
+          class="gap-1.5 font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs cursor-pointer"
+          title="Xuất trọn gói: CSV, JSON và toàn bộ file ảnh avatar (JPG/SVG) về máy"
         >
           <FolderArchive class="w-4 h-4 text-white" />
           <span>Xuất Gói Hoàn Chỉnh (Bundle)</span>
