@@ -1,5 +1,20 @@
-// Detect Tauri Environment
-const isTauri = typeof window !== 'undefined' && window.__TAURI__ && window.__TAURI__.core;
+// Universal Tauri Invoke Resolver
+function getTauriInvoke() {
+  if (typeof window !== 'undefined') {
+    if (window.__TAURI_INTERNALS__ && typeof window.__TAURI_INTERNALS__.invoke === 'function') {
+      return (cmd, payload) => window.__TAURI_INTERNALS__.invoke(cmd, payload);
+    }
+    if (window.__TAURI__ && window.__TAURI__.core && typeof window.__TAURI__.core.invoke === 'function') {
+      return (cmd, payload) => window.__TAURI__.core.invoke(cmd, payload);
+    }
+    if (window.__TAURI__ && typeof window.__TAURI__.invoke === 'function') {
+      return (cmd, payload) => window.__TAURI__.invoke(cmd, payload);
+    }
+  }
+  return null;
+}
+
+const isTauri = getTauriInvoke() !== null;
 
 // App State
 let currentUsers = [];
@@ -81,7 +96,85 @@ function setTab(tab) {
   jsonContainer.classList.toggle('hidden', tab !== 'json');
 }
 
-// Fetch Random Users (Supports Tauri IPC & Fallback HTTP)
+// Built-in JavaScript Offline Generator (Triple Safety Net)
+function generateClientMockUsers(count, genderFilter, natCode) {
+  const isVn = (natCode || '').toLowerCase().includes('vn');
+  const maleFirst = isVn
+    ? ['Minh', 'Hoàng', 'Duy', 'Tuấn', 'Nam', 'Quân', 'Long', 'Đức', 'Anh', 'Hùng', 'Bảo', 'Huy', 'Thành', 'Phúc', 'Việt']
+    : ['James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Joseph', 'Thomas', 'Charles', 'Daniel', 'Matthew'];
+  
+  const femaleFirst = isVn
+    ? ['Linh', 'Trang', 'Hương', 'Mai', 'Lan', 'Ngọc', 'Hà', 'Phương', 'Thu', 'Thảo', 'Huyền', 'Yến', 'My', 'Hằng', 'Tú']
+    : ['Mary', 'Patricia', 'Jennifer', 'Linda', 'Elizabeth', 'Barbara', 'Susan', 'Jessica', 'Sarah', 'Karen', 'Lisa', 'Nancy'];
+  
+  const lastNames = isVn
+    ? ['Nguyễn', 'Trần', 'Lê', 'Phạm', 'Hoàng', 'Huỳnh', 'Phan', 'Vũ', 'Võ', 'Đặng', 'Bùi', 'Đỗ', 'Hồ', 'Ngô', 'Dương']
+    : ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez'];
+  
+  const cities = isVn
+    ? ['Hà Nội', 'TP Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ', 'Nha Trang', 'Huế', 'Vũng Tàu', 'Bình Dương']
+    : ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego'];
+
+  const streets = isVn
+    ? ['Đường Lê Lợi', 'Đường Nguyễn Huệ', 'Đường Trần Hưng Đạo', 'Đường Hai Bà Trưng', 'Đường Lý Thường Kiệt']
+    : ['Main Street', 'Oak Avenue', 'Maple Lane', 'Cedar Drive', 'Pine Court', 'Washington Boulevard'];
+
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    const isMale = genderFilter === 'male' ? true : (genderFilter === 'female' ? false : Math.random() > 0.5);
+    const gender = isMale ? 'male' : 'female';
+    const firstList = isMale ? maleFirst : femaleFirst;
+    const first = firstList[Math.floor(Math.random() * firstList.length)];
+    const last = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const title = isMale ? 'Mr' : (Math.random() > 0.5 ? 'Ms' : 'Mrs');
+    const street = `${Math.floor(Math.random() * 8999) + 100} ${streets[Math.floor(Math.random() * streets.length)]}`;
+    const city = cities[Math.floor(Math.random() * cities.length)];
+    const country = isVn ? 'Vietnam' : 'United States';
+    const num = Math.floor(Math.random() * 8999) + 1000;
+    const username = `${first.toLowerCase()}_${last.toLowerCase()}${num}`.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
+    const email = `${username}@example.com`;
+    const password = `Pass_${Math.floor(Math.random() * 8999) + 1000}!`;
+    const phone = isVn ? `09${Math.floor(Math.random() * 89999999) + 10000000}` : `(555) 019-${num}`;
+    const avatarGender = isMale ? 'men' : 'women';
+    const avatarId = Math.floor(Math.random() * 95) + 1;
+    const age = Math.floor(Math.random() * 45) + 20;
+
+    results.push({
+      gender,
+      name: { title, first, last },
+      location: {
+        street: { number: num, name: street },
+        city,
+        state: isVn ? city : 'California',
+        country,
+        postcode: `${Math.floor(Math.random() * 89999) + 10000}`
+      },
+      email,
+      login: {
+        uuid: 'uuid-' + Math.random().toString(36).substring(2, 12),
+        username,
+        password
+      },
+      dob: { date: `${2026 - age}-05-15T00:00:00.000Z`, age },
+      phone,
+      cell: phone,
+      picture: {
+        large: `https://randomuser.me/api/portraits/${avatarGender}/${avatarId}.jpg`,
+        medium: `https://randomuser.me/api/portraits/med/${avatarGender}/${avatarId}.jpg`,
+        thumbnail: `https://randomuser.me/api/portraits/thumb/${avatarGender}/${avatarId}.jpg`
+      },
+      nat: isVn ? 'VN' : (natCode || 'US').toUpperCase()
+    });
+  }
+
+  return {
+    results,
+    source: 'client-offline-engine',
+    offlineFallback: true
+  };
+}
+
+// Fetch Random Users (3-Tier Engine: Tauri Rust -> Direct HTTPS -> Built-in Client Mock)
 async function fetchUsers() {
   const count = parseInt(inputCount.value, 10) || 10;
   const gender = selectGender.value || null;
@@ -94,56 +187,74 @@ async function fetchUsers() {
   jsonContainer.classList.add('hidden');
 
   const startTime = performance.now();
+  let data = null;
 
-  try {
-    let data;
-
-    if (isTauri) {
-      // Direct Native Rust IPC Call!
-      data = await window.__TAURI__.core.invoke('fetch_users', {
+  // Tier 1: Try Native Tauri IPC
+  const invoke = getTauriInvoke();
+  if (invoke) {
+    try {
+      data = await invoke('fetch_users', {
         count: count,
         gender: gender,
         nat: nat,
         mode: mode
       });
-    } else {
-      // Browser fallback (Express server)
-      const url = new URL('/api/users', window.location.origin);
-      url.searchParams.set('results', count);
-      if (gender) url.searchParams.set('gender', gender);
-      if (nat) url.searchParams.set('nat', nat);
-      if (mode) url.searchParams.set('mode', mode);
-
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      data = await res.json();
+    } catch (ipcErr) {
+      console.warn('Tauri IPC failed, switching to Tier 2 (Direct Web):', ipcErr);
     }
-
-    const endTime = performance.now();
-
-    currentUsers = data.results || [];
-    filteredUsers = [...currentUsers];
-
-    // Update Stats
-    const elapsed = Math.round(endTime - startTime);
-    loadTime.textContent = `${elapsed} ms`;
-    resultCount.textContent = `${currentUsers.length} profiles`;
-    sourceInfo.textContent = data.source || (data.offlineFallback ? 'Offline' : 'API');
-    
-    if (data.offlineFallback || (data.source && data.source.includes('offline'))) {
-      sourceInfo.className = 'px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-mono text-[11px]';
-    } else {
-      sourceInfo.className = 'px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono text-[11px]';
-    }
-
-    renderData();
-  } catch (err) {
-    console.error('Fetch error:', err);
-    showToast('Lỗi khi tải dữ liệu! Vui lòng thử lại.');
-  } finally {
-    loadingState.classList.add('hidden');
-    setTab(currentTab);
   }
+
+  // Tier 2: Try Direct Web Fetch (Supports CORS)
+  if (!data || !data.results || !data.results.length) {
+    const isVn = (nat || '').toLowerCase().includes('vn');
+    if (isVn && mode !== 'api') {
+      data = generateClientMockUsers(count, gender, 'VN');
+    } else {
+      try {
+        let apiUrl = `https://randomuser.me/api/?results=${count}`;
+        if (gender) apiUrl += `&gender=${gender}`;
+        if (nat && nat !== 'all') apiUrl += `&nat=${nat}`;
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+
+        const res = await fetch(apiUrl, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          data = await res.json();
+          data.source = 'randomuser.me (Direct)';
+        }
+      } catch (netErr) {
+        console.warn('Direct web fetch failed, switching to Tier 3 (Offline):', netErr);
+      }
+    }
+  }
+
+  // Tier 3: Ultimate Fallback (Guaranteed to always work offline)
+  if (!data || !data.results || !data.results.length) {
+    data = generateClientMockUsers(count, gender, nat || 'US');
+  }
+
+  const endTime = performance.now();
+  currentUsers = data.results || [];
+  filteredUsers = [...currentUsers];
+
+  // Update Stats
+  const elapsed = Math.round(endTime - startTime);
+  loadTime.textContent = `${elapsed} ms`;
+  resultCount.textContent = `${currentUsers.length} profiles`;
+  sourceInfo.textContent = data.source || (data.offlineFallback ? 'Offline' : 'API');
+  
+  if (data.offlineFallback || (data.source && data.source.includes('offline'))) {
+    sourceInfo.className = 'px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-mono text-[11px]';
+  } else {
+    sourceInfo.className = 'px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono text-[11px]';
+  }
+
+  renderData();
+  loadingState.classList.add('hidden');
+  setTab(currentTab);
 }
 
 // Render Data
@@ -348,34 +459,34 @@ async function exportCSV() {
 
   const csvContent = generateCSVString(currentUsers);
   const defaultName = `random-users-${Date.now()}.csv`;
+  const invoke = getTauriInvoke();
 
-  if (isTauri) {
-    // Native Windows File Dialog
+  if (invoke) {
     try {
-      const savedPath = await window.__TAURI__.core.invoke('save_file_dialog', {
+      const savedPath = await invoke('save_file_dialog', {
         defaultName: defaultName,
         content: csvContent,
         extension: 'csv'
       });
       if (savedPath) {
         showToast(`Đã lưu file thành công!`);
+        return;
       }
     } catch (err) {
-      console.error('Tauri save dialog error:', err);
-      showToast('Lỗi khi lưu file!');
+      console.warn('Tauri save dialog error, falling back to browser download:', err);
     }
-  } else {
-    // Browser blob download
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = defaultName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    showToast('Đã tải xuống file CSV!');
   }
+
+  // Browser blob download fallback
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = defaultName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  showToast('Đã tải xuống file CSV!');
 }
 
 // Export to JSON
@@ -387,33 +498,33 @@ async function exportJSON() {
 
   const jsonContent = JSON.stringify(currentUsers, null, 2);
   const defaultName = `random-users-${Date.now()}.json`;
+  const invoke = getTauriInvoke();
 
-  if (isTauri) {
-    // Native Windows File Dialog
+  if (invoke) {
     try {
-      const savedPath = await window.__TAURI__.core.invoke('save_file_dialog', {
+      const savedPath = await invoke('save_file_dialog', {
         defaultName: defaultName,
         content: jsonContent,
         extension: 'json'
       });
       if (savedPath) {
         showToast(`Đã lưu file thành công!`);
+        return;
       }
     } catch (err) {
-      console.error('Tauri save dialog error:', err);
-      showToast('Lỗi khi lưu file!');
+      console.warn('Tauri save dialog error, falling back to browser download:', err);
     }
-  } else {
-    // Browser blob download
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonContent);
-    const a = document.createElement('a');
-    a.href = dataStr;
-    a.download = defaultName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    showToast('Đã tải xuống file JSON!');
   }
+
+  // Browser blob download fallback
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonContent);
+  const a = document.createElement('a');
+  a.href = dataStr;
+  a.download = defaultName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  showToast('Đã tải xuống file JSON!');
 }
 
 // Client-side quick filter
