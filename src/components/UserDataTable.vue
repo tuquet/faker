@@ -182,9 +182,12 @@ const paginatedUsers = computed(() => {
             <td class="py-2.5 px-4">
               <img
                 :src="u.picture?.thumbnail || u.picture?.medium || 'https://randomuser.me/api/portraits/lego/1.jpg'"
-                class="w-8 h-8 rounded-lg object-cover bg-slate-100 border border-slate-200 cursor-pointer hover:ring-2 hover:ring-sky-400 transition"
+                width="32"
+                height="32"
+                class="w-8 h-8 rounded-lg object-cover bg-slate-100 border border-slate-200 cursor-pointer hover:ring-2 hover:ring-sky-400 transition shrink-0"
+                style="width: 32px; height: 32px; object-fit: cover;"
                 loading="lazy"
-                title="Bấm để tải ảnh avatar này"
+                title="Click to download this avatar"
                 @click="emit('downloadAvatar', u)"
               />
             </td>
@@ -200,7 +203,7 @@ const paginatedUsers = computed(() => {
                   u.gender === 'female' ? 'bg-pink-50 text-pink-700 border-pink-200' : 'bg-blue-50 text-blue-700 border-blue-200'
                 ]"
               >
-                {{ u.gender === 'female' ? 'Nữ ♀' : 'Nam ♂' }}
+                {{ u.gender === 'female' ? 'Female ♀' : 'Male ♂' }}
               </Badge>
             </td>
             <td class="py-2.5 px-4 whitespace-nowrap">
@@ -212,7 +215,7 @@ const paginatedUsers = computed(() => {
               <button
                 @click="handleCopy(u.email, `tbl-email-${idx}`, 'Email')"
                 class="flex items-center gap-1.5 text-slate-700 hover:text-sky-600 font-mono transition text-[11px] group cursor-pointer"
-                title="Bấm để copy Email"
+                title="Click to copy email"
               >
                 <span class="truncate max-w-[180px]">{{ u.email }}</span>
                 <Check v-if="copiedKey === `tbl-email-${idx}`" class="w-3 h-3 text-emerald-600 shrink-0" />
@@ -221,9 +224,9 @@ const paginatedUsers = computed(() => {
             </td>
             <td class="py-2.5 px-4">
               <button
-                @click="handleCopy(u.phone, `tbl-phone-${idx}`, 'Số điện thoại')"
+                @click="handleCopy(u.phone, `tbl-phone-${idx}`, 'Phone Number')"
                 class="flex items-center gap-1.5 text-slate-700 hover:text-sky-600 font-mono transition text-[11px] group cursor-pointer"
-                title="Bấm để copy SĐT"
+                title="Click to copy phone number"
               >
                 <span class="truncate max-w-[120px]">{{ u.phone }}</span>
                 <Check v-if="copiedKey === `tbl-phone-${idx}`" class="w-3 h-3 text-emerald-600 shrink-0" />

@@ -56,23 +56,26 @@ function getFullAddress(u: UserProfile): string {
       <div class="p-5 space-y-3">
         <!-- Top: Avatar & Name -->
         <div class="flex items-start space-x-3.5">
-          <div class="relative shrink-0 group/avatar">
+          <div class="relative shrink-0 group/avatar w-[72px] h-[72px]" style="width: 72px; height: 72px;">
             <img
               :src="u.picture?.large || u.picture?.medium || 'https://randomuser.me/api/portraits/lego/1.jpg'"
               :alt="getFullName(u)"
-              class="w-18 h-18 rounded-2xl object-cover bg-slate-100 border border-slate-200 shadow-sm"
+              width="72"
+              height="72"
+              class="w-[72px] h-[72px] rounded-2xl object-cover bg-slate-100 border border-slate-200 shadow-sm"
+              style="width: 72px; height: 72px; object-fit: cover;"
               loading="lazy"
             />
             <button
               @click.stop="emit('downloadAvatar', u)"
               title="Download Avatar"
-              class="absolute inset-0 bg-slate-900/60 text-white rounded-2xl opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-all cursor-pointer backdrop-blur-2xs"
+              class="absolute inset-0 bg-slate-900/60 text-white rounded-2xl opacity-0 group-hover/avatar:opacity-100 flex items-center justify-center transition-all cursor-pointer backdrop-blur-sm"
             >
-              <Download class="w-6 h-6 drop-shadow" />
+              <Download class="w-5 h-5 drop-shadow" />
             </button>
             <span
               :class="[
-                'absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold text-white',
+                'absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center text-[10px] font-bold text-white',
                 u.gender === 'female' ? 'bg-pink-500' : 'bg-blue-500'
               ]"
               :title="u.gender === 'female' ? 'Female' : 'Male'"
@@ -158,7 +161,7 @@ function getFullAddress(u: UserProfile): string {
           <button
             @click="handleCopy(u.login?.password || '', `pass-${idx}`, 'Password')"
             title="Copy Password"
-            class="p-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition shadow-2xs shrink-0 cursor-pointer"
+            class="p-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition shadow-xs shrink-0 cursor-pointer"
           >
             <Check v-if="copiedKey === `pass-${idx}`" class="w-3.5 h-3.5 text-emerald-600" />
             <Key v-else class="w-3.5 h-3.5" />

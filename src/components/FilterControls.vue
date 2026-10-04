@@ -68,7 +68,7 @@ const natOptions = [
             :class="[
               'px-2 py-0.5 text-xs font-semibold rounded-md transition-all cursor-pointer',
               count === qc
-                ? 'bg-sky-600 text-white shadow-2xs'
+                ? 'bg-sky-600 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
             ]"
           >
