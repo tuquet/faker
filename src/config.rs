@@ -28,11 +28,11 @@ pub struct FakerConfig {
 impl Default for FakerConfig {
     fn default() -> Self {
         Self {
-            email_domains: vec!["flowup.io.vn".to_string()],
-            default_domain: "flowup.io.vn".to_string(),
-            email_pattern: "first.last".to_string(),
-            default_nat: "VN".to_string(),
-            default_avatar: "real".to_string(),
+            email_domains: vec![crate::constants::DEFAULT_EMAIL_DOMAIN.to_string()],
+            default_domain: crate::constants::DEFAULT_EMAIL_DOMAIN.to_string(),
+            email_pattern: crate::constants::DEFAULT_EMAIL_PATTERN.to_string(),
+            default_nat: crate::constants::DEFAULT_NATIONALITY.to_string(),
+            default_avatar: crate::constants::DEFAULT_AVATAR_STYLE.to_string(),
         }
     }
 }
@@ -48,14 +48,14 @@ impl FakerConfig {
         let home = std::env::var("USERPROFILE")
             .or_else(|_| std::env::var("HOME"))
             .unwrap_or_else(|_| ".".to_string());
-        PathBuf::from(home).join(".specter")
+        PathBuf::from(home).join(crate::constants::DEFAULT_SSOT_DIR_NAME)
     }
 
     /// Single source of truth (SSOT) config path: ~/.specter/faker/faker.json
     pub fn config_path() -> PathBuf {
-        let faker_dir = Self::canonical_dir().join("faker");
+        let faker_dir = Self::canonical_dir().join(crate::constants::PILLAR_DIR_FAKER);
         let _ = fs::create_dir_all(&faker_dir);
-        faker_dir.join("faker.json")
+        faker_dir.join(crate::constants::CONFIG_FILE_FAKER_JSON)
     }
 
     /// Load config from ~/.specter/faker/faker.json.
@@ -94,7 +94,7 @@ impl FakerConfig {
     pub fn normalize(&mut self) {
         self.default_domain = clean_domain(&self.default_domain);
         if self.default_domain.is_empty() {
-            self.default_domain = "flowup.io.vn".to_string();
+            self.default_domain = crate::constants::DEFAULT_EMAIL_DOMAIN.to_string();
         }
 
         let mut cleaned_domains: Vec<String> = self.email_domains

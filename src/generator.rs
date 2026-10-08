@@ -60,7 +60,7 @@ pub fn generate_local_users(
     for _ in 0..count {
         // Resolve provider per iteration if nat_choice == "ALL", otherwise use requested nationality
         let provider: Box<dyn NationalityProvider> = if nat_choice.eq_ignore_ascii_case("all") {
-            let options = ["VN", "US", "JP"];
+            let options = crate::constants::ALL_NATIONALITIES;
             get_provider(options[rng.gen_range(0..options.len())])
         } else {
             get_provider(nat_choice)
@@ -75,8 +75,8 @@ pub fn generate_local_users(
         let gender_str = if is_male { "male" } else { "female" };
         let title_str = if is_male { "Mr" } else { if rng.gen_bool(0.6) { "Ms" } else { "Mrs" } };
 
-        // Realistic working age bracket: 18 to 45
-        let age = rng.gen_range(18..=45);
+        // Realistic working age bracket
+        let age = rng.gen_range(crate::constants::PERSONA_MIN_AGE..=crate::constants::PERSONA_MAX_AGE);
         let birth_year = 2026 - age;
         let birth_month = rng.gen_range(1..=12);
         let birth_day = rng.gen_range(1..=28);
@@ -112,7 +112,8 @@ pub fn generate_local_users(
         let (avatar_large, avatar_medium, avatar_thumb) = if is_svg {
             let avatar_seed = format!("{}-{}", username, user_uuid);
             let url = format!(
-                "https://api.dicebear.com/7.x/avataaars/svg?seed={}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf",
+                "{}?seed={}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf",
+                crate::constants::URL_DICEBEAR_AVATAR,
                 avatar_seed
             );
             (url.clone(), url.clone(), url)
@@ -120,9 +121,9 @@ pub fn generate_local_users(
             let photo_id = rng.gen_range(0..100);
             let gender_dir = if is_male { "men" } else { "women" };
             (
-                format!("https://randomuser.me/api/portraits/{}/{}.jpg", gender_dir, photo_id),
-                format!("https://randomuser.me/api/portraits/med/{}/{}.jpg", gender_dir, photo_id),
-                format!("https://randomuser.me/api/portraits/thumb/{}/{}.jpg", gender_dir, photo_id),
+                format!("{}/{}/{}.jpg", crate::constants::URL_RANDOMUSER_PORTRAITS, gender_dir, photo_id),
+                format!("{}/med/{}/{}.jpg", crate::constants::URL_RANDOMUSER_PORTRAITS, gender_dir, photo_id),
+                format!("{}/thumb/{}/{}.jpg", crate::constants::URL_RANDOMUSER_PORTRAITS, gender_dir, photo_id),
             )
         };
 

@@ -2,6 +2,7 @@ pub mod models;
 pub mod providers;
 pub mod generator;
 pub mod config;
+pub mod constants;
 
 pub use config::FakerConfig;
 pub use generator::{generate_local_users, generate_local_users as generate_users, to_ascii_slug};
