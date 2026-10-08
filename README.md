@@ -73,13 +73,13 @@ The `faker.json` configuration file controls email domain rotation, pattern temp
 Manage and inspect configuration directly via Master CLI:
 ```powershell
 # Display active SSOT configuration card
-tuquet faker config --show
+specter faker config --show
 
 # Open faker.json in default system editor
-tuquet faker config --edit
+specter faker config --edit
 
 # Dynamically set or prepend a default email domain
-tuquet faker config -d yourcompany.com
+specter faker config -d yourcompany.com
 ```
 
 ### 2. Custom Demographic Templates (`~/.specter/faker/templates/`)
@@ -94,46 +94,46 @@ Store custom demographic datasets and template overrides inside `~/.specter/fake
 
 Tuquet Faker integrates directly into the unified Tuquet developer experience via both direct CLI execution and the interactive REPL shell:
 
-### 1. Direct Command (`tuquet faker generate`)
+### 1. Direct Command (`specter faker generate`)
 Generate realistic, verified synthetic identities directly from PowerShell or Command Prompt:
 
 ```powershell
 # Generate 5 Vietnamese profiles in interactive terminal table
-tuquet faker generate -n 5
+specter faker generate -n 5
 
 # Generate 10 profiles in JSON format
-tuquet faker generate -n 10 -f json -o users.json
+specter faker generate -n 10 -f json -o users.json
 
 # Export 100 profiles to CSV with gender and nationality filters
-tuquet faker generate -n 100 --gender female --nat VN -f csv -o test_users.csv
+specter faker generate -n 100 --gender female --nat VN -f csv -o test_users.csv
 
 # Render a detailed verified identity card in terminal
-tuquet faker card --gender female
+specter faker card --gender female
 ```
 
-### 2. Master CLI REPL (`tuquet use faker`)
-Inside the Tuquet Master CLI interactive shell, switch directly to the Faker scope using `use faker` for rapid, continuous profile generation:
+### 2. Master CLI REPL (`specter use faker`)
+Inside the Master CLI interactive shell, switch directly to the Faker scope using `use faker` for rapid, continuous profile generation:
 
 ```console
 # Launch interactive REPL
-tuquet
+specter
 ```
 
 ```text
 ============================================================
-  🛸 Tuquet Unified Interactive Shell (v1.0.0)
+  SPECTER Unified Interactive Shell (v1.0.0)
 ============================================================
 Type 'help' for commands, 'use <service>' to switch scope, 'exit' to quit.
 
-tuquet> use faker
-tuquet(faker)> generate -n 5
-tuquet(faker)> card --gender female
-tuquet(faker)> config --show
-tuquet(faker)> back
-tuquet> exit
+specter> use faker
+specter(faker)> generate -n 5
+specter(faker)> card --gender female
+specter(faker)> config --show
+specter(faker)> back
+specter> exit
 ```
 
-> 💡 **Direct Scope Shortcut**: You can also enter the Faker scope directly from terminal via `tuquet shell faker`.
+> 💡 **Direct Scope Shortcut**: You can also enter the Faker scope directly from terminal via `specter shell faker`.
 
 ---
 
