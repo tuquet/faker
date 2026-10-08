@@ -1,27 +1,28 @@
 <div align="center">
-  <img src="https://tuquet.github.io/icons/random-user-generator.svg" width="76" height="76" alt="Tuquet Faker Logo" />
-  <h1>Tuquet Faker</h1>
+  <img src="https://tuquet.github.io/icons/random-user-generator.svg" width="76" height="76" alt="Specter Faker Logo" />
+  <h1>Specter Faker (`specter faker`)</h1>
   <p><strong>Enterprise-Grade Synthetic Persona &amp; Test Identity Generator in Rust</strong></p>
 
   <p>
-    <a href="https://github.com/tuquet/scoop-bucket"><img src="https://img.shields.io/badge/Scoop-tuquet-blue.svg" alt="Scoop Bucket" /></a>
+    <a href="https://github.com/tuquet/scoop-bucket"><img src="https://img.shields.io/badge/Scoop-specter-brightgreen.svg" alt="Scoop Bucket" /></a>
+    <a href="https://tuquet.github.io/docs/features/faker"><img src="https://img.shields.io/badge/Docs-VitePress%20Portal-blue.svg" alt="Documentation" /></a>
     <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Language-Rust-orange.svg" alt="Rust" /></a>
     <img src="https://img.shields.io/badge/SSOT-Pillar%205%20(~%2F.specter%2Ffaker)-purple.svg" alt="Pillar 5" />
-    <a href="https://github.com/tuquet/skills/blob/main/skills/tuquet-faker/SKILL.md"><img src="https://img.shields.io/badge/Skill-%2Ftuquet--faker-purple.svg" alt="Tuquet Faker Skill" /></a>
+    <a href="https://github.com/tuquet/skills/blob/main/skills/specter-faker/SKILL.md"><img src="https://img.shields.io/badge/Skill-%2Fspecter--faker-purple.svg" alt="Specter Faker Skill" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" /></a>
   </p>
-  <p><strong><a href="https://github.com/tuquet/skills/blob/main/skills/tuquet-faker/SKILL.md">⚡ Operational Skill Reference (`/tuquet-faker`) &rarr;</a></strong></p>
+  <p><strong><a href="https://tuquet.github.io/docs/features/faker">📖 Read Full Documentation in Portal &rarr;</a> • <a href="https://github.com/tuquet/skills/blob/main/skills/specter-faker/SKILL.md">⚡ Operational Skill Reference (`/specter-faker`) &rarr;</a></strong></p>
 </div>
 
 ---
 
 ## Executive Summary
 
-**Tuquet Faker** (`tuquet-faker`) is a high-performance, offline-first synthetic persona and identity generation engine for software developers, QA automation suites, and anti-detect multi-profile environments.
+**Specter Faker** (`specter faker`) is a high-performance, offline-first synthetic persona and identity generation engine for software developers, QA automation suites, and anti-detect multi-profile environments.
 
 Engineered natively in pure Rust with zero webview overhead, it produces realistic, demographically weighted, and structurally validated identities with compliant Vietnamese Citizen Identity numbers (CCCD), cohesive address hierarchies, and high-entropy credentials in sub-millisecond execution time.
 
-It functions both as a **standalone CLI binary** and as a **modular plugin/crate** for the [Tuquet Master CLI](https://github.com/tuquet/cli).
+It functions both as a **standalone CLI binary** and as a **modular plugin/crate** for the [Specter Master CLI](https://github.com/tuquet/cli).
 
 ---
 
@@ -45,7 +46,7 @@ It functions both as a **standalone CLI binary** and as a **modular plugin/crate
 
 ## 🏛️ SSOT Configuration & Storage Architecture (Pillar 5)
 
-In strict adherence to Tuquet's **Single Source of Truth (SSOT)** and microservice pillar standards, all Faker schema configurations, override rules, and custom templates resolve exclusively to the canonical root domain `~/.specter/faker/`:
+In strict adherence to Specter's **Single Source of Truth (SSOT)** and microservice pillar standards, all Faker schema configurations, override rules, and custom templates resolve exclusively to the canonical root domain `~/.specter/faker/`:
 
 ```text
 ~/.specter/faker/
@@ -92,7 +93,7 @@ Store custom demographic datasets and template overrides inside `~/.specter/fake
 
 ## ⚡ Master CLI & Interactive REPL Integration
 
-Tuquet Faker integrates directly into the unified Tuquet developer experience via both direct CLI execution and the interactive REPL shell:
+Specter Faker integrates directly into the unified Specter developer experience via both direct CLI execution and the interactive REPL shell:
 
 ### 1. Direct Command (`specter faker generate`)
 Generate realistic, verified synthetic identities directly from PowerShell or Command Prompt:
@@ -191,6 +192,14 @@ fn main() {
     println!("{}", csv);
 }
 ```
+
+---
+
+## 📖 Comprehensive Documentation
+
+For full demographic datasets, CCCD algorithmic verification, and custom template development guides, visit the official **Specter Documentation Portal**:
+
+👉 **[https://tuquet.github.io/docs/features/faker](https://tuquet.github.io/docs/features/faker)**
 
 ---
 
