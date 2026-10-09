@@ -6,8 +6,8 @@ pub const DEFAULT_EMAIL_DOMAIN: &str = "flowup.io.vn";
 /// Default email pattern structure ("first.last")
 pub const DEFAULT_EMAIL_PATTERN: &str = "first.last";
 
-/// Default nationality code ("VN" for Vietnam)
-pub const DEFAULT_NATIONALITY: &str = "VN";
+/// Default nationality code ("US" for United States)
+pub const DEFAULT_NATIONALITY: &str = "US";
 
 /// Default avatar generation style ("real" for photography, "svg" for vector)
 pub const DEFAULT_AVATAR_STYLE: &str = "real";

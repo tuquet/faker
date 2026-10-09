@@ -1,17 +1,17 @@
 <div align="center">
-  <img src="https://tuquet.github.io/icons/random-user-generator.svg" width="76" height="76" alt="Specter Faker Logo" />
+  <img src="https://tuquet.com/icons/random-user-generator.svg" width="76" height="76" alt="Specter Faker Logo" />
   <h1>Specter Faker (`specter faker`)</h1>
   <p><strong>Enterprise-Grade Synthetic Persona & Test Identity Generator in Rust</strong></p>
 
   <p>
-    <a href="https://tuquet.github.io/docs/faker/"><img src="https://img.shields.io/badge/Docs-VitePress%20Hub-blue.svg" alt="Documentation Hub" /></a>
+    <a href="https://specter.tuquet.com/faker/"><img src="https://img.shields.io/badge/Docs-VitePress%20Hub-blue.svg" alt="Documentation Hub" /></a>
     <a href="https://github.com/tuquet/scoop-bucket"><img src="https://img.shields.io/badge/Scoop-specter-brightgreen.svg" alt="Scoop" /></a>
     <a href="https://www.rust-lang.org/"><img src="https://img.shields.io/badge/Rust-Clap-orange.svg" alt="Rust" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" /></a>
   </p>
 
   <p>
-    <strong><a href="https://tuquet.github.io/docs/faker/">📖 Đọc toàn bộ tài liệu kỹ thuật tại Documentation Hub &rarr;</a></strong>
+    <strong><a href="https://specter.tuquet.com/faker/">📖 Đọc toàn bộ tài liệu kỹ thuật tại Documentation Hub &rarr;</a></strong>
   </p>
 </div>
 
@@ -38,4 +38,4 @@ specter faker generate -n 10 --json > personas.json
 
 Toàn bộ thuật toán sinh CCCD 12 số, cấu trúc cây địa chỉ hành chính, quy chuẩn `faker.json` và bảng tham số CLI được bảo trì duy nhất tại Documentation Hub:
 
-👉 **[https://tuquet.github.io/docs/faker/](https://tuquet.github.io/docs/faker/)**
+👉 **[https://specter.tuquet.com/faker/](https://specter.tuquet.com/faker/)**

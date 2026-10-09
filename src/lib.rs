@@ -5,8 +5,10 @@ pub mod config;
 pub mod constants;
 
 pub use config::FakerConfig;
-pub use generator::{generate_local_users, generate_local_users as generate_users, to_ascii_slug};
-pub use providers::{get_provider, supported_nationalities, NationalityProvider};
+pub use generator::{generate_id_only, generate_local_users, generate_local_users as generate_users, to_ascii_slug};
+pub use providers::{
+    get_provider, list_nationality_metadata, supported_nationalities, NationalityMetadata, NationalityProvider,
+};
 use serde_json::Value;
 
 /// Convert a slice of JSON user values into formatted RFC-compliant CSV content.
@@ -85,6 +87,15 @@ pub fn to_json(users: &[Value], pretty: bool) -> Result<String, serde_json::Erro
     }
 }
 
+/// Convert any serializable value into formatted JSON string.
+pub fn to_json_value<T: serde::Serialize>(value: &T, pretty: bool) -> Result<String, serde_json::Error> {
+    if pretty {
+        serde_json::to_string_pretty(value)
+    } else {
+        serde_json::to_string(value)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -96,5 +107,14 @@ mod tests {
         assert_eq!(results.len(), 5);
         let csv = to_csv(results);
         assert!(csv.contains("Full Name"));
+    }
+
+    #[test]
+    fn test_list_nationalities() {
+        let nats = list_nationality_metadata();
+        assert_eq!(nats.len(), 3);
+        assert!(nats.iter().any(|n| n.code == "US" && n.id_type == "SSN"));
+        assert!(nats.iter().any(|n| n.code == "VN" && n.id_type == "CCCD"));
+        assert!(nats.iter().any(|n| n.code == "JP" && n.id_type == "My Number"));
     }
 }

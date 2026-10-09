@@ -1,5 +1,5 @@
 [package]
-name = "tuquet-faker"
+name = "faker"
 version = "1.0.0"
 edition = "2021"
 description = "Enterprise-grade synthetic persona and identity test data generator with validated national ID and geographic structures"
@@ -9,11 +9,11 @@ repository = "https://github.com/tuquet/faker"
 readme = "README.md"
 
 [lib]
-name = "tuquet_faker"
+name = "faker"
 path = "src/lib.rs"
 
 [[bin]]
-name = "tuquet-faker"
+name = "faker"
 path = "src/main.rs"
 
 [dependencies]

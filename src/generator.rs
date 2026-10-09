@@ -222,9 +222,54 @@ pub fn generate_local_users(
     })
 }
 
+pub fn generate_id_only(nat_filter: Option<&str>) -> Value {
+    let mut rng = rand::thread_rng();
+    let config = crate::config::FakerConfig::load();
+    let nat_choice = nat_filter.unwrap_or(&config.default_nat);
+
+    let provider: Box<dyn NationalityProvider> = if nat_choice.eq_ignore_ascii_case("all") {
+        let options = crate::constants::ALL_NATIONALITIES;
+        get_provider(options[rng.gen_range(0..options.len())])
+    } else {
+        get_provider(nat_choice)
+    };
+
+    let age = rng.gen_range(crate::constants::PERSONA_MIN_AGE..=crate::constants::PERSONA_MAX_AGE);
+    let birth_year = 2026 - age;
+    let is_male = rng.gen_bool(0.5);
+
+    let rng_core = &mut rng as &mut dyn rand::RngCore;
+    let id_data = provider.generate_id(birth_year, is_male, rng_core);
+
+    json!({
+        "nat": provider.nat_code(),
+        "type": id_data.name,
+        "value": id_data.value,
+        "valid": true
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_generate_id_only() {
+        let id_us = generate_id_only(Some("US"));
+        assert_eq!(id_us["nat"], "US");
+        assert_eq!(id_us["type"], "SSN");
+        assert!(id_us["value"].as_str().unwrap().contains('-'));
+
+        let id_vn = generate_id_only(Some("VN"));
+        assert_eq!(id_vn["nat"], "VN");
+        assert_eq!(id_vn["type"], "CCCD");
+        assert_eq!(id_vn["value"].as_str().unwrap().len(), 12);
+
+        let id_jp = generate_id_only(Some("JP"));
+        assert_eq!(id_jp["nat"], "JP");
+        assert_eq!(id_jp["type"], "My Number");
+        assert_eq!(id_jp["value"].as_str().unwrap().len(), 12);
+    }
 
     #[test]
     fn test_generate_default_count() {

@@ -1,7 +1,7 @@
 use clap::{Parser, ValueEnum};
 use std::fs;
 use std::path::PathBuf;
-use tuquet_faker::{generate_users, to_csv, to_json};
+use faker::{generate_users, to_csv, to_json};
 
 #[derive(Copy, Clone, PartialEq, Eq, ValueEnum, Debug)]
 pub enum OutputFormat {

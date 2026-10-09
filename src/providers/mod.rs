@@ -42,3 +42,42 @@ pub fn get_provider(nat_code: &str) -> Box<dyn NationalityProvider> {
 pub fn supported_nationalities() -> &'static [&'static str] {
     &["VN", "US", "JP"]
 }
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct NationalityMetadata {
+    pub code: &'static str,
+    pub country: &'static str,
+    pub id_type: &'static str,
+    pub phone_prefix: &'static str,
+    pub timezone: &'static str,
+    pub address_hierarchy: &'static str,
+}
+
+pub fn list_nationality_metadata() -> Vec<NationalityMetadata> {
+    vec![
+        NationalityMetadata {
+            code: "US",
+            country: "United States",
+            id_type: "SSN",
+            phone_prefix: "+1",
+            timezone: "-05:00",
+            address_hierarchy: "Street, City, State, ZIP",
+        },
+        NationalityMetadata {
+            code: "VN",
+            country: "Vietnam",
+            id_type: "CCCD",
+            phone_prefix: "+84",
+            timezone: "+07:00",
+            address_hierarchy: "Street, Ward, District, City",
+        },
+        NationalityMetadata {
+            code: "JP",
+            country: "Japan",
+            id_type: "My Number",
+            phone_prefix: "+81",
+            timezone: "+09:00",
+            address_hierarchy: "Block, Ward, City, Prefecture, Postal Code",
+        },
+    ]
+}
