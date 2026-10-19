@@ -13,7 +13,9 @@ pub const DEFAULT_NATIONALITY: &str = "US";
 pub const DEFAULT_AVATAR_STYLE: &str = "real";
 
 /// Canonical SSOT directory name under user home
-pub const DEFAULT_SSOT_DIR_NAME: &str = ".specter";
+pub const DEFAULT_SSOT_DIR_NAME: &str = ".tuquet";
+pub const ENV_TUQUET_HOME: &str = "TUQUET_HOME";
+pub const ENV_SPECTER_HOME: &str = "SPECTER_HOME";
 
 /// Pillar subdirectory name
 pub const PILLAR_DIR_FAKER: &str = "faker";

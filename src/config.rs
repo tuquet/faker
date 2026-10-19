@@ -38,9 +38,10 @@ impl Default for FakerConfig {
 }
 
 impl FakerConfig {
-    /// Canonical root directory for Specter SSOT (~/.specter/ or $SPECTER_HOME)
+    /// Canonical root directory for Tuquet SSOT (~/.tuquet/ or $TUQUET_HOME)
     pub fn canonical_dir() -> PathBuf {
-        if let Ok(dir) = std::env::var("SPECTER_HOME") {
+        if let Ok(dir) = std::env::var(crate::constants::ENV_TUQUET_HOME)
+            .or_else(|_| std::env::var(crate::constants::ENV_SPECTER_HOME)) {
             if !dir.trim().is_empty() {
                 return PathBuf::from(dir);
             }
@@ -160,5 +161,14 @@ mod tests {
         assert_eq!(cfg.pick_domain(&mut rng, None), "flowup.io.vn");
         // Override pick with @
         assert_eq!(cfg.pick_domain(&mut rng, Some("@custom.org")), "custom.org");
+    }
+
+    #[test]
+    fn test_canonical_dir() {
+        let dir = FakerConfig::canonical_dir();
+        assert!(
+            dir.to_string_lossy().contains(".tuquet")
+                || dir.to_string_lossy().contains(".specter")
+        );
     }
 }
