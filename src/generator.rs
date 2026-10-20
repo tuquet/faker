@@ -214,7 +214,7 @@ pub fn generate_local_users(
     json!({
         "results": results,
         "info": {
-            "seed": "tuquet-rust-deterministic-suite",
+            "seed": "rust-deterministic-suite",
             "results": count,
             "page": 1,
             "version": "2.0.0"

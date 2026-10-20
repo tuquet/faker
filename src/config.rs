@@ -38,7 +38,7 @@ impl Default for FakerConfig {
 }
 
 impl FakerConfig {
-    /// Canonical root directory for Tuquet SSOT (~/.tuquet/ or $TUQUET_HOME)
+    /// Canonical root directory for SSOT (~/.tuquet/ or $TUQUET_HOME)
     pub fn canonical_dir() -> PathBuf {
         if let Ok(dir) = std::env::var(crate::constants::ENV_TUQUET_HOME)
             .or_else(|_| std::env::var(crate::constants::ENV_SPECTER_HOME)) {

@@ -12,10 +12,10 @@ pub enum OutputFormat {
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "tuquet-faker",
-    author = "Tuquet Team <dev@tuquet.io>",
+    name = "faker",
+    author = "Team <dev@tuquet.io>",
     version = env!("CARGO_PKG_VERSION"),
-    about = "Tuquet Synthetic Persona & Identity Generator with validated national ID and geographic structures"
+    about = "Synthetic Persona & Identity Generator with validated national ID and geographic structures"
 )]
 pub struct Cli {
     /// Number of profiles to generate
