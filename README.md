@@ -20,7 +20,7 @@
 
 **Faker** là công cụ sinh dữ liệu danh tính nhân vật giả lập (synthetic personas) chuẩn xác cao phục vụ kiểm thử QA, điền form tự động và nuôi tài khoản. Viết bằng Rust thuần túy với độ trễ sub-millisecond (0ms network round-trip), Faker hỗ trợ đầy đủ thuật toán sinh số Căn cước Công dân (CCCD) Việt Nam hợp lệ, địa chỉ hành chính gắn liền mã bưu chính và email/mật khẩu entropy cao.
 
-* **Lưu trữ SSOT (Pillar 5)**: Cấu hình schema và override domain pool lưu tại `~/.tuquet/faker/faker.json`.
+* **Lưu trữ SSOT (Pillar 5)**: Cấu hình schema và override domain pool lưu tại `~/.tq/faker/faker.json`.
 * **Air-gapped & Offline**: Không phụ thuộc vào API bên ngoài, đảm bảo dữ liệu sinh ra tức thì và bảo mật tuyệt đối.
 
 ## ⚡ Sử Dụng Nhanh (Quickstart)
