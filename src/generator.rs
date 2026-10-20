@@ -28,7 +28,7 @@ pub fn to_ascii_slug(s: &str) -> String {
 
 pub fn generate_secure_password(rng: &mut impl rand::Rng) -> String {
     let prefixes = [
-        "Specter", "VnPro", "Shield", "Secure", "Titan", "Falcon", "Nova", "Prime", "Turbo", "Apex", "Matrix", "Cyber"
+        "Tuquet", "VnPro", "Shield", "Secure", "Titan", "Falcon", "Nova", "Prime", "Turbo", "Apex", "Matrix", "Cyber"
     ];
     let specials = ['@', '#', '$', '!', '&', '*'];
     let suffixes = ["acc", "pro", "app", "hub", "net", "top", "run", "key"];
@@ -214,7 +214,7 @@ pub fn generate_local_users(
     json!({
         "results": results,
         "info": {
-            "seed": "specter-rust-deterministic-suite",
+            "seed": "tuquet-rust-deterministic-suite",
             "results": count,
             "page": 1,
             "version": "2.0.0"

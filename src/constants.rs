@@ -1,4 +1,4 @@
-//! Enterprise Constants for Specter Synthetic Identity & Persona Generator
+//! Enterprise Constants for Tuquet Synthetic Identity & Persona Generator
 
 /// Default email domain used when no custom domain or override is supplied
 pub const DEFAULT_EMAIL_DOMAIN: &str = "flowup.io.vn";

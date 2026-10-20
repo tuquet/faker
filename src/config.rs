@@ -52,14 +52,14 @@ impl FakerConfig {
         PathBuf::from(home).join(crate::constants::DEFAULT_SSOT_DIR_NAME)
     }
 
-    /// Single source of truth (SSOT) config path: ~/.specter/faker/faker.json
+    /// Single source of truth (SSOT) config path: ~/.tuquet/faker/faker.json
     pub fn config_path() -> PathBuf {
         let faker_dir = Self::canonical_dir().join(crate::constants::PILLAR_DIR_FAKER);
         let _ = fs::create_dir_all(&faker_dir);
         faker_dir.join(crate::constants::CONFIG_FILE_FAKER_JSON)
     }
 
-    /// Load config from ~/.specter/faker/faker.json.
+    /// Load config from ~/.tuquet/faker/faker.json.
     /// If file does not exist, automatically creates default faker.json and returns it.
     pub fn load() -> Self {
         let path = Self::config_path();
@@ -79,7 +79,7 @@ impl FakerConfig {
         config
     }
 
-    /// Save configuration to ~/.specter/faker/faker.json
+    /// Save configuration to ~/.tuquet/faker/faker.json
     pub fn save(&self) -> Result<(), std::io::Error> {
         let path = Self::config_path();
         if let Some(parent) = path.parent() {
@@ -168,7 +168,7 @@ mod tests {
         let dir = FakerConfig::canonical_dir();
         assert!(
             dir.to_string_lossy().contains(".tuquet")
-                || dir.to_string_lossy().contains(".specter")
+                || dir.to_string_lossy().contains(".tuquet")
         );
     }
 }
