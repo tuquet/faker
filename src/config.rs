@@ -60,7 +60,7 @@ impl FakerConfig {
     }
 
     /// Load config from ~/.tq/faker/faker.json.
-    /// If file does not exist, automatically creates default faker.json and returns it.
+    /// If file does not exist, automationtically creates default faker.json and returns it.
     pub fn load() -> Self {
         let path = Self::config_path();
         if path.exists() {

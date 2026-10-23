@@ -202,7 +202,7 @@ impl NationalityProvider for JapanProvider {
             "Frontend Engineer",
             "Project Manager (プロジェクトマネージャー)",
             "Cloud / DevOps Engineer",
-            "Bridge Software Engineer (BrSE)",
+            "Gateway Software Engineer (BrSE)",
             "UI/UX Designer",
             "Data Analyst (データアナリスト)",
             "Solution Architect",
