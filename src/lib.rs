@@ -1,13 +1,16 @@
-pub mod models;
-pub mod providers;
-pub mod generator;
 pub mod config;
 pub mod constants;
+pub mod generator;
+pub mod models;
+pub mod providers;
 
 pub use config::FakerConfig;
-pub use generator::{generate_id_only, generate_local_users, generate_local_users as generate_users, to_ascii_slug};
+pub use generator::{
+    generate_id_only, generate_local_users, generate_local_users as generate_users, to_ascii_slug,
+};
 pub use providers::{
-    get_provider, list_nationality_metadata, supported_nationalities, NationalityMetadata, NationalityProvider,
+    get_provider, list_nationality_metadata, supported_nationalities, NationalityMetadata,
+    NationalityProvider,
 };
 use serde_json::Value;
 
@@ -31,7 +34,11 @@ pub fn to_csv(users: &[Value]) -> String {
         let full_name = format!("{} {}", first_name, last_name);
         let gender = u["gender"].as_str().unwrap_or("");
         let dob_raw = u["dob"]["date"].as_str().unwrap_or("");
-        let dob = if dob_raw.len() >= 10 { &dob_raw[..10] } else { dob_raw };
+        let dob = if dob_raw.len() >= 10 {
+            &dob_raw[..10]
+        } else {
+            dob_raw
+        };
         let age = u["dob"]["age"].to_string();
         let id_val = u["id"]["value"].as_str().unwrap_or("");
         let email = u["email"].as_str().unwrap_or("");
@@ -88,7 +95,10 @@ pub fn to_json(users: &[Value], pretty: bool) -> Result<String, serde_json::Erro
 }
 
 /// Convert any serializable value into formatted JSON string.
-pub fn to_json_value<T: serde::Serialize>(value: &T, pretty: bool) -> Result<String, serde_json::Error> {
+pub fn to_json_value<T: serde::Serialize>(
+    value: &T,
+    pretty: bool,
+) -> Result<String, serde_json::Error> {
     if pretty {
         serde_json::to_string_pretty(value)
     } else {
@@ -115,6 +125,8 @@ mod tests {
         assert_eq!(nats.len(), 3);
         assert!(nats.iter().any(|n| n.code == "US" && n.id_type == "SSN"));
         assert!(nats.iter().any(|n| n.code == "VN" && n.id_type == "CCCD"));
-        assert!(nats.iter().any(|n| n.code == "JP" && n.id_type == "My Number"));
+        assert!(nats
+            .iter()
+            .any(|n| n.code == "JP" && n.id_type == "My Number"));
     }
 }

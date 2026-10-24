@@ -41,7 +41,8 @@ impl FakerConfig {
     /// Canonical root directory for SSOT (~/.tq/ or $TQ_HOME)
     pub fn canonical_dir() -> PathBuf {
         if let Ok(dir) = std::env::var(crate::constants::ENV_TQ_HOME)
-            .or_else(|_| std::env::var(crate::constants::ENV_SPECTER_HOME)) {
+            .or_else(|_| std::env::var(crate::constants::ENV_SPECTER_HOME))
+        {
             if !dir.trim().is_empty() {
                 return PathBuf::from(dir);
             }
@@ -85,8 +86,7 @@ impl FakerConfig {
         if let Some(parent) = path.parent() {
             let _ = fs::create_dir_all(parent);
         }
-        let json_str = serde_json::to_string_pretty(self)
-            .map_err(std::io::Error::other)?;
+        let json_str = serde_json::to_string_pretty(self).map_err(std::io::Error::other)?;
         fs::write(path, json_str)?;
         Ok(())
     }
@@ -98,7 +98,8 @@ impl FakerConfig {
             self.default_domain = crate::constants::DEFAULT_EMAIL_DOMAIN.to_string();
         }
 
-        let mut cleaned_domains: Vec<String> = self.email_domains
+        let mut cleaned_domains: Vec<String> = self
+            .email_domains
             .iter()
             .map(|d| clean_domain(d))
             .filter(|d| !d.is_empty())
@@ -166,9 +167,6 @@ mod tests {
     #[test]
     fn test_canonical_dir() {
         let dir = FakerConfig::canonical_dir();
-        assert!(
-            dir.to_string_lossy().contains(".tq")
-                || dir.to_string_lossy().contains(".tq")
-        );
+        assert!(dir.to_string_lossy().contains(".tq") || dir.to_string_lossy().contains(".tq"));
     }
 }

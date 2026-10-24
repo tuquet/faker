@@ -1,6 +1,6 @@
-use rand::Rng;
-use crate::models::{IdentityData, LocationData, NameData};
 use super::NationalityProvider;
+use crate::models::{IdentityData, LocationData, NameData};
+use rand::Rng;
 
 pub struct UsaProvider;
 
@@ -16,37 +16,68 @@ static US_LOCATIONS: &[UsStateLocation] = &[
         state: "California",
         city: "Los Angeles",
         zipcode: "90001",
-        streets: &["Sunset Boulevard", "Hollywood Boulevard", "Wilshire Boulevard", "Rodeo Drive"],
+        streets: &[
+            "Sunset Boulevard",
+            "Hollywood Boulevard",
+            "Wilshire Boulevard",
+            "Rodeo Drive",
+        ],
     },
     UsStateLocation {
         state: "New York",
         city: "New York City",
         zipcode: "10001",
-        streets: &["Broadway", "Fifth Avenue", "Wall Street", "Madison Avenue", "Park Avenue"],
+        streets: &[
+            "Broadway",
+            "Fifth Avenue",
+            "Wall Street",
+            "Madison Avenue",
+            "Park Avenue",
+        ],
     },
     UsStateLocation {
         state: "Texas",
         city: "Houston",
         zipcode: "77001",
-        streets: &["Main Street", "Texas Avenue", "Post Oak Boulevard", "Westheimer Road"],
+        streets: &[
+            "Main Street",
+            "Texas Avenue",
+            "Post Oak Boulevard",
+            "Westheimer Road",
+        ],
     },
     UsStateLocation {
         state: "Florida",
         city: "Miami",
         zipcode: "33101",
-        streets: &["Ocean Drive", "Biscayne Boulevard", "Collins Avenue", "Brickell Avenue"],
+        streets: &[
+            "Ocean Drive",
+            "Biscayne Boulevard",
+            "Collins Avenue",
+            "Brickell Avenue",
+        ],
     },
     UsStateLocation {
         state: "Washington",
         city: "Seattle",
         zipcode: "98101",
-        streets: &["Pike Street", "Pine Street", "Second Avenue", "University Street"],
+        streets: &[
+            "Pike Street",
+            "Pine Street",
+            "Second Avenue",
+            "University Street",
+        ],
     },
     UsStateLocation {
         state: "Illinois",
         city: "Chicago",
         zipcode: "60601",
-        streets: &["Michigan Avenue", "State Street", "Wacker Drive", "Lake Shore Drive"],
+        streets: &[
+            "Michigan Avenue",
+            "State Street",
+            "Wacker Drive",
+            "Lake Shore Drive",
+        ],
     },
 ];
 
@@ -62,15 +93,43 @@ impl NationalityProvider for UsaProvider {
     fn generate_name(&self, is_male: bool, rng: &mut dyn rand::RngCore) -> NameData {
         let first_names_male = [
             "James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph",
-            "Thomas", "Charles", "Daniel", "Matthew", "Anthony", "Mark", "Donald", "Steven"
+            "Thomas", "Charles", "Daniel", "Matthew", "Anthony", "Mark", "Donald", "Steven",
         ];
         let first_names_female = [
-            "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica",
-            "Sarah", "Karen", "Lisa", "Nancy", "Betty", "Margaret", "Sandra", "Ashley"
+            "Mary",
+            "Patricia",
+            "Jennifer",
+            "Linda",
+            "Elizabeth",
+            "Barbara",
+            "Susan",
+            "Jessica",
+            "Sarah",
+            "Karen",
+            "Lisa",
+            "Nancy",
+            "Betty",
+            "Margaret",
+            "Sandra",
+            "Ashley",
         ];
         let last_names = [
-            "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
-            "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas"
+            "Smith",
+            "Johnson",
+            "Williams",
+            "Brown",
+            "Jones",
+            "Garcia",
+            "Miller",
+            "Davis",
+            "Rodriguez",
+            "Martinez",
+            "Hernandez",
+            "Lopez",
+            "Gonzalez",
+            "Wilson",
+            "Anderson",
+            "Thomas",
         ];
 
         let first = if is_male {
@@ -107,8 +166,18 @@ impl NationalityProvider for UsaProvider {
         }
     }
 
-    fn generate_id(&self, _birth_year: u32, _is_male: bool, rng: &mut dyn rand::RngCore) -> IdentityData {
-        let ssn = format!("{:03}-{:02}-{:04}", rng.gen_range(100..900), rng.gen_range(10..99), rng.gen_range(1000..9999));
+    fn generate_id(
+        &self,
+        _birth_year: u32,
+        _is_male: bool,
+        rng: &mut dyn rand::RngCore,
+    ) -> IdentityData {
+        let ssn = format!(
+            "{:03}-{:02}-{:04}",
+            rng.gen_range(100..900),
+            rng.gen_range(10..99),
+            rng.gen_range(1000..9999)
+        );
         IdentityData {
             name: "SSN",
             value: ssn,
@@ -116,14 +185,24 @@ impl NationalityProvider for UsaProvider {
     }
 
     fn generate_phone(&self, rng: &mut dyn rand::RngCore) -> String {
-        format!("+1 ({:03}) {:03}-{:04}", rng.gen_range(201..999), rng.gen_range(200..999), rng.gen_range(1000..9999))
+        format!(
+            "+1 ({:03}) {:03}-{:04}",
+            rng.gen_range(201..999),
+            rng.gen_range(200..999),
+            rng.gen_range(1000..9999)
+        )
     }
 
     fn generate_job(&self, rng: &mut dyn rand::RngCore) -> &'static str {
         let jobs = [
-            "Staff Software Engineer", "Product Manager", "Lead Data Scientist",
-            "Cloud Solutions Architect", "UI/UX Principal", "Engineering Director",
-            "Cybersecurity Specialist", "Technical Program Manager"
+            "Staff Software Engineer",
+            "Product Manager",
+            "Lead Data Scientist",
+            "Cloud Solutions Architect",
+            "UI/UX Principal",
+            "Engineering Director",
+            "Cybersecurity Specialist",
+            "Technical Program Manager",
         ];
         jobs[rng.gen_range(0..jobs.len())]
     }

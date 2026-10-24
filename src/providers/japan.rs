@@ -1,6 +1,6 @@
-use rand::Rng;
-use crate::models::{IdentityData, LocationData, NameData};
 use super::NationalityProvider;
+use crate::models::{IdentityData, LocationData, NameData};
+use rand::Rng;
 
 pub struct JapanProvider;
 
@@ -18,28 +18,48 @@ static JP_LOCATIONS: &[JpCityLocation] = &[
         city: "Tokyo",
         ward: "Chiyoda-ku",
         zipcode: "100-0001",
-        streets: &["Chiyoda 1-chome", "Marunouchi 2-chome", "Otemachi 1-chome", "Kanda-Jinbocho 2-chome"],
+        streets: &[
+            "Chiyoda 1-chome",
+            "Marunouchi 2-chome",
+            "Otemachi 1-chome",
+            "Kanda-Jinbocho 2-chome",
+        ],
     },
     JpCityLocation {
         prefecture: "Tokyo",
         city: "Tokyo",
         ward: "Shinjuku-ku",
         zipcode: "160-0022",
-        streets: &["Shinjuku 3-chome", "Kabukicho 1-chome", "Nishi-Shinjuku 2-chome", "Takadanobaba 1-chome"],
+        streets: &[
+            "Shinjuku 3-chome",
+            "Kabukicho 1-chome",
+            "Nishi-Shinjuku 2-chome",
+            "Takadanobaba 1-chome",
+        ],
     },
     JpCityLocation {
         prefecture: "Tokyo",
         city: "Tokyo",
         ward: "Shibuya-ku",
         zipcode: "150-0002",
-        streets: &["Shibuya 2-chome", "Dogenzaka 1-chome", "Jingumae 4-chome", "Ebisu-Minami 1-chome"],
+        streets: &[
+            "Shibuya 2-chome",
+            "Dogenzaka 1-chome",
+            "Jingumae 4-chome",
+            "Ebisu-Minami 1-chome",
+        ],
     },
     JpCityLocation {
         prefecture: "Tokyo",
         city: "Tokyo",
         ward: "Minato-ku",
         zipcode: "106-0032",
-        streets: &["Roppongi 6-chome", "Akasaka 9-chome", "Shiba-Koen 4-chome", "Toranomon 2-chome"],
+        streets: &[
+            "Roppongi 6-chome",
+            "Akasaka 9-chome",
+            "Shiba-Koen 4-chome",
+            "Toranomon 2-chome",
+        ],
     },
     JpCityLocation {
         prefecture: "Osaka",
@@ -53,7 +73,11 @@ static JP_LOCATIONS: &[JpCityLocation] = &[
         city: "Osaka",
         ward: "Chuo-ku",
         zipcode: "542-0081",
-        streets: &["Namba 3-chome", "Dotonbori 1-chome", "Shinsaibashisuji 2-chome"],
+        streets: &[
+            "Namba 3-chome",
+            "Dotonbori 1-chome",
+            "Shinsaibashisuji 2-chome",
+        ],
     },
     JpCityLocation {
         prefecture: "Kyoto",
@@ -67,7 +91,11 @@ static JP_LOCATIONS: &[JpCityLocation] = &[
         city: "Yokohama",
         ward: "Nishi-ku",
         zipcode: "220-0012",
-        streets: &["Minatomirai 3-chome", "Takashima 2-chome", "Kitasaiwai 1-chome"],
+        streets: &[
+            "Minatomirai 3-chome",
+            "Takashima 2-chome",
+            "Kitasaiwai 1-chome",
+        ],
     },
     JpCityLocation {
         prefecture: "Fukuoka",
@@ -95,11 +123,7 @@ fn calculate_my_number_check_digit(digits: &[u32; 11]) -> u32 {
     let mut sum = 0;
     for (i, &p) in digits.iter().enumerate() {
         let n = 11 - i; // P1 is the rightmost digit before check digit (position 11)
-        let q = if (1..=6).contains(&n) {
-            n + 1
-        } else {
-            n - 5
-        };
+        let q = if (1..=6).contains(&n) { n + 1 } else { n - 5 };
         sum += p * (q as u32);
     }
     let rem = sum % 11;
@@ -121,19 +145,36 @@ impl NationalityProvider for JapanProvider {
 
     fn generate_name(&self, is_male: bool, rng: &mut dyn rand::RngCore) -> NameData {
         let last_names = [
-            "Sato", "Suzuki", "Takahashi", "Tanaka", "Watanabe", "Ito", "Yamamoto",
-            "Nakamura", "Kobayashi", "Kato", "Yoshida", "Yamada", "Sasaki", "Yamaguchi",
-            "Saito", "Matsumoto", "Inoue", "Kimura", "Hayashi", "Shimizu"
+            "Sato",
+            "Suzuki",
+            "Takahashi",
+            "Tanaka",
+            "Watanabe",
+            "Ito",
+            "Yamamoto",
+            "Nakamura",
+            "Kobayashi",
+            "Kato",
+            "Yoshida",
+            "Yamada",
+            "Sasaki",
+            "Yamaguchi",
+            "Saito",
+            "Matsumoto",
+            "Inoue",
+            "Kimura",
+            "Hayashi",
+            "Shimizu",
         ];
 
         let first_names_male = [
-            "Ren", "Haruto", "Minato", "Yuto", "Sota", "Riku", "Kento", "Daiki",
-            "Ryota", "Sora", "Kaito", "Hayato", "Takumi", "Kazuki", "Shota"
+            "Ren", "Haruto", "Minato", "Yuto", "Sota", "Riku", "Kento", "Daiki", "Ryota", "Sora",
+            "Kaito", "Hayato", "Takumi", "Kazuki", "Shota",
         ];
 
         let first_names_female = [
-            "Yui", "Aoi", "Hina", "Rin", "Mei", "Sakura", "Yuna", "Koharu",
-            "Akari", "Nanami", "Mio", "Misaki", "Nana", "Riko", "Ayaka"
+            "Yui", "Aoi", "Hina", "Rin", "Mei", "Sakura", "Yuna", "Koharu", "Akari", "Nanami",
+            "Mio", "Misaki", "Nana", "Riko", "Ayaka",
         ];
 
         let last = last_names[rng.gen_range(0..last_names.len())];
@@ -172,7 +213,12 @@ impl NationalityProvider for JapanProvider {
         }
     }
 
-    fn generate_id(&self, _birth_year: u32, _is_male: bool, rng: &mut dyn rand::RngCore) -> IdentityData {
+    fn generate_id(
+        &self,
+        _birth_year: u32,
+        _is_male: bool,
+        rng: &mut dyn rand::RngCore,
+    ) -> IdentityData {
         let mut digits = [0u32; 11];
         // Ensure first digit is non-zero
         digits[0] = rng.gen_range(1..=9);
@@ -180,7 +226,8 @@ impl NationalityProvider for JapanProvider {
             *d = rng.gen_range(0..=9);
         }
         let check_digit = calculate_my_number_check_digit(&digits);
-        let my_number: String = digits.iter().map(|d| d.to_string()).collect::<String>() + &check_digit.to_string();
+        let my_number: String =
+            digits.iter().map(|d| d.to_string()).collect::<String>() + &check_digit.to_string();
 
         IdentityData {
             name: "My Number",
@@ -192,7 +239,12 @@ impl NationalityProvider for JapanProvider {
         // NTT Docomo, au, SoftBank mobile prefixes: 090, 080, 070
         let mobile_prefixes = ["090", "080", "070"];
         let prefix = mobile_prefixes[rng.gen_range(0..mobile_prefixes.len())];
-        format!("+81 {}-{:04}-{:04}", &prefix[1..], rng.gen_range(1000..9999), rng.gen_range(1000..9999))
+        format!(
+            "+81 {}-{:04}-{:04}",
+            &prefix[1..],
+            rng.gen_range(1000..9999),
+            rng.gen_range(1000..9999)
+        )
     }
 
     fn generate_job(&self, rng: &mut dyn rand::RngCore) -> &'static str {
@@ -207,7 +259,7 @@ impl NationalityProvider for JapanProvider {
             "Data Analyst (データアナリスト)",
             "Solution Architect",
             "QA / Test Automation Specialist",
-            "Product Operations Manager"
+            "Product Operations Manager",
         ];
         jobs[rng.gen_range(0..jobs.len())]
     }

@@ -1,7 +1,7 @@
 use clap::{Parser, ValueEnum};
+use faker::{generate_users, to_csv, to_json};
 use std::fs;
 use std::path::PathBuf;
-use faker::{generate_users, to_csv, to_json};
 
 #[derive(Copy, Clone, PartialEq, Eq, ValueEnum, Debug)]
 pub enum OutputFormat {
@@ -50,11 +50,25 @@ pub struct Cli {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
 
-    let gender_opt = if cli.gender == "all" { None } else { Some(cli.gender.as_str()) };
-    let nat_opt = if cli.nat == "all" { None } else { Some(cli.nat.as_str()) };
+    let gender_opt = if cli.gender == "all" {
+        None
+    } else {
+        Some(cli.gender.as_str())
+    };
+    let nat_opt = if cli.nat == "all" {
+        None
+    } else {
+        Some(cli.nat.as_str())
+    };
     let avatar_opt = Some(cli.avatar.as_str());
 
-    let data = generate_users(cli.count, gender_opt, nat_opt, avatar_opt, cli.domain.as_deref());
+    let data = generate_users(
+        cli.count,
+        gender_opt,
+        nat_opt,
+        avatar_opt,
+        cli.domain.as_deref(),
+    );
     let users = data["results"].as_array().expect("results is array");
 
     let output_str = match cli.format {
@@ -82,7 +96,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 out.push_str(&format!(
                     "{:<4} {:<24} {:<8} {:<4} {:<14} {:<28} {:<18} {:<16}\n",
-                    i + 1, full_name, gender, age, cccd, email, phone, city
+                    i + 1,
+                    full_name,
+                    gender,
+                    age,
+                    cccd,
+                    email,
+                    phone,
+                    city
                 ));
             }
             out

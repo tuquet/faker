@@ -1,8 +1,8 @@
 use crate::models::{IdentityData, LocationData, NameData};
 
-pub mod vietnam;
-pub mod usa;
 pub mod japan;
+pub mod usa;
+pub mod vietnam;
 
 pub trait NationalityProvider: Send + Sync {
     /// Two-letter ISO / Alpha-2 nationality code (e.g. "VN", "US", "JP")
@@ -18,7 +18,12 @@ pub trait NationalityProvider: Send + Sync {
     fn generate_location(&self, rng: &mut dyn rand::RngCore) -> LocationData;
 
     /// Generate government-compliant National ID (CCCD, SSN, My Number, etc.)
-    fn generate_id(&self, birth_year: u32, is_male: bool, rng: &mut dyn rand::RngCore) -> IdentityData;
+    fn generate_id(
+        &self,
+        birth_year: u32,
+        is_male: bool,
+        rng: &mut dyn rand::RngCore,
+    ) -> IdentityData;
 
     /// Generate realistic telecom phone number
     fn generate_phone(&self, rng: &mut dyn rand::RngCore) -> String;
